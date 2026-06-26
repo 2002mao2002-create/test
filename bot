@@ -165,225 +165,226 @@ def evaluate_pronunciation(transcribed: str, correct_he: str, correct_translit: 
         f"Перевод: {correct_ru}"
     )
     return call_claude(system, user_text, max_tokens=300)
+
 LESSONS = {
     "greetings": {
         "title": "👋 Приветствия",
         "phrases": [
-            {"he": "שָׁלוֹם", "translit": "Шалом", "translit_en": "Shalom", "ru": "Привет / Мир"},
-            {"he": "בֹּקֶר טוֹב", "translit": "Бокер тов", "translit_en": "Boker tov", "ru": "Доброе утро"},
-            {"he": "עֶרֶב טוֹב", "translit": "Эрев тов", "translit_en": "Erev tov", "ru": "Добрый вечер"},
-            {"he": "לַיְלָה טוֹב", "translit": "Лайла тов", "translit_en": "Layla tov", "ru": "Спокойной ночи"},
-            {"he": "מַה שְׁלוֹמְךָ?", "translit": "Ма шломха? (м) / Ма шломех? (ж)", "translit_en": "Ma shlomcha? (m) / Ma shlomech? (f)", "ru": "Как дела?"},
-            {"he": "בְּסֵדֶר", "translit": "Бесэдэр", "translit_en": "Beseder", "ru": "Хорошо / Нормально"},
-            {"he": "תּוֹדָה", "translit": "Тода", "translit_en": "Toda", "ru": "Спасибо"},
-            {"he": "בְּבַקָּשָׁה", "translit": "Бевакаша", "translit_en": "Bevakasha", "ru": "Пожалуйста"},
-            {"he": "סְלִיחָה", "translit": "Слиха", "translit_en": "Slicha", "ru": "Извините / Простите"},
-            {"he": "לְהִתְרָאוֹת", "translit": "Лехитраот", "translit_en": "Lehitraot", "ru": "До свидания"},
+            {"he": "שָׁלוֹם", "translit": "Шалом", "ru": "Привет / Мир"},
+            {"he": "בֹּקֶר טוֹב", "translit": "Бокер тов", "ru": "Доброе утро"},
+            {"he": "עֶרֶב טוֹב", "translit": "Эрев тов", "ru": "Добрый вечер"},
+            {"he": "לַיְלָה טוֹב", "translit": "Лайла тов", "ru": "Спокойной ночи"},
+            {"he": "מַה שְׁלוֹמְךָ?", "translit": "Ма шломха? (м) / Ма шломех? (ж)", "ru": "Как дела?"},
+            {"he": "בְּסֵדֶר", "translit": "Бесэдэр", "ru": "Хорошо / Нормально"},
+            {"he": "תּוֹדָה", "translit": "Тода", "ru": "Спасибо"},
+            {"he": "בְּבַקָּשָׁה", "translit": "Бевакаша", "ru": "Пожалуйста"},
+            {"he": "סְלִיחָה", "translit": "Слиха", "ru": "Извините / Простите"},
+            {"he": "לְהִתְרָאוֹת", "translit": "Лехитраот", "ru": "До свидания"},
         ]
     },
     "numbers": {
         "title": "🔢 Числа",
         "phrases": [
-            {"he": "אֶחָד", "translit": "Эхад", "translit_en": "Echad", "ru": "Один (1)"},
-            {"he": "שְׁתַּיִם", "translit": "Штаим", "translit_en": "Shtayim", "ru": "Два (2)"},
-            {"he": "שָׁלוֹשׁ", "translit": "Шалош", "translit_en": "Shalosh", "ru": "Три (3)"},
-            {"he": "אַרְבַּע", "translit": "Арба", "translit_en": "Arba", "ru": "Четыре (4)"},
-            {"he": "חָמֵשׁ", "translit": "Хамеш", "translit_en": "Hamesh", "ru": "Пять (5)"},
-            {"he": "שֵׁשׁ", "translit": "Шеш", "translit_en": "Shesh", "ru": "Шесть (6)"},
-            {"he": "שֶׁבַע", "translit": "Шева", "translit_en": "Sheva", "ru": "Семь (7)"},
-            {"he": "שְׁמוֹנֶה", "translit": "Шмоне", "translit_en": "Shmone", "ru": "Восемь (8)"},
-            {"he": "תֵּשַׁע", "translit": "Теша", "translit_en": "Tesha", "ru": "Девять (9)"},
-            {"he": "עֶשֶׂר", "translit": "Эсэр", "translit_en": "Eser", "ru": "Десять (10)"},
+            {"he": "אֶחָד", "translit": "Эхад", "ru": "Один (1)"},
+            {"he": "שְׁתַּיִם", "translit": "Штаим", "ru": "Два (2)"},
+            {"he": "שָׁלוֹשׁ", "translit": "Шалош", "ru": "Три (3)"},
+            {"he": "אַרְבַּע", "translit": "Арба", "ru": "Четыре (4)"},
+            {"he": "חָמֵשׁ", "translit": "Хамеш", "ru": "Пять (5)"},
+            {"he": "שֵׁשׁ", "translit": "Шеш", "ru": "Шесть (6)"},
+            {"he": "שֶׁבַע", "translit": "Шева", "ru": "Семь (7)"},
+            {"he": "שְׁמוֹנֶה", "translit": "Шмоне", "ru": "Восемь (8)"},
+            {"he": "תֵּשַׁע", "translit": "Теша", "ru": "Девять (9)"},
+            {"he": "עֶשֶׂר", "translit": "Эсэр", "ru": "Десять (10)"},
         ]
     },
     "food": {
         "title": "🔥 10 главных глаголов",
         "phrases": [
-            {"he": "לִהְיוֹת", "translit": "Лихйот", "translit_en": "Lihyot", "ru": "Быть / являться"},
-            {"he": "לַעֲשׂוֹת", "translit": "Лаасот", "translit_en": "La'asot", "ru": "Делать"},
-            {"he": "לוֹמַר", "translit": "Ломар", "translit_en": "Lomar", "ru": "Говорить / сказать"},
-            {"he": "לָלֶכֶת", "translit": "Лалехет", "translit_en": "Lalachet", "ru": "Идти / ходить"},
-            {"he": "לָדַעַת", "translit": "Лада'ат", "translit_en": "Lada'at", "ru": "Знать"},
-            {"he": "לִרְאוֹת", "translit": "Лиръот", "translit_en": "Lirot", "ru": "Видеть"},
-            {"he": "לָבוֹא", "translit": "Лаво", "translit_en": "Lavo", "ru": "Приходить / прийти"},
-            {"he": "לָתֵת", "translit": "Латет", "translit_en": "Latet", "ru": "Давать / дать"},
-            {"he": "לְדַבֵּר", "translit": "Ледабер", "translit_en": "Ledaber", "ru": "Разговаривать"},
-            {"he": "לִרְצוֹת", "translit": "Лирцот", "translit_en": "Lirtzot", "ru": "Хотеть"},
+            {"he": "לִהְיוֹת", "translit": "Лихйот", "ru": "Быть / являться"},
+            {"he": "לַעֲשׂוֹת", "translit": "Лаасот", "ru": "Делать"},
+            {"he": "לוֹמַר", "translit": "Ломар", "ru": "Говорить / сказать"},
+            {"he": "לָלֶכֶת", "translit": "Лалехет", "ru": "Идти / ходить"},
+            {"he": "לָדַעַת", "translit": "Лада'ат", "ru": "Знать"},
+            {"he": "לִרְאוֹת", "translit": "Лиръот", "ru": "Видеть"},
+            {"he": "לָבוֹא", "translit": "Лаво", "ru": "Приходить / прийти"},
+            {"he": "לָתֵת", "translit": "Латет", "ru": "Давать / дать"},
+            {"he": "לְדַבֵּר", "translit": "Ледабер", "ru": "Разговаривать"},
+            {"he": "לִרְצוֹת", "translit": "Лирцот", "ru": "Хотеть"},
         ]
     },
     "phrases": {
         "title": "📖 100 главных слов",
         "phrases": [
-            {"he": "אֲנִי", "translit": "Ани", "translit_en": "Ani", "ru": "Я"},
-            {"he": "אַתָּה / אַתְּ", "translit": "Ата / Ат", "translit_en": "Ata / At", "ru": "Ты (м/ж)"},
-            {"he": "הוּא", "translit": "Ху", "translit_en": "Hu", "ru": "Он"},
-            {"he": "הִיא", "translit": "Хи", "translit_en": "Hi", "ru": "Она"},
-            {"he": "אֲנַחְנוּ", "translit": "Анахну", "translit_en": "Anachnu", "ru": "Мы"},
-            {"he": "אַתֶּם / אַתֶּן", "translit": "Атем / Атен", "translit_en": "Atem / Aten", "ru": "Вы (м/ж)"},
-            {"he": "הֵם / הֵן", "translit": "Хем / Хен", "translit_en": "Hem / Hen", "ru": "Они (м/ж)"},
-            {"he": "כֵּן", "translit": "Кен", "translit_en": "Ken", "ru": "Да"},
-            {"he": "לֹא", "translit": "Ло", "translit_en": "Lo", "ru": "Нет"},
-            {"he": "מָה", "translit": "Ма", "translit_en": "Ma", "ru": "Что"},
-            {"he": "מִי", "translit": "Ми", "translit_en": "Mi", "ru": "Кто"},
-            {"he": "אֵיפֹה", "translit": "Эйфо", "translit_en": "Eifo", "ru": "Где"},
-            {"he": "מָתַי", "translit": "Матай", "translit_en": "Matai", "ru": "Когда"},
-            {"he": "לָמָּה", "translit": "Лама", "translit_en": "Lama", "ru": "Почему"},
-            {"he": "אֵיךְ", "translit": "Эйх", "translit_en": "Eich", "ru": "Как"},
-            {"he": "כַּמָּה", "translit": "Кама", "translit_en": "Kama", "ru": "Сколько"},
-            {"he": "זֶה / זֹאת", "translit": "Зе / Зот", "translit_en": "Ze / Zot", "ru": "Это (м/ж)"},
-            {"he": "כָּל", "translit": "Коль", "translit_en": "Kol", "ru": "Всё / каждый"},
-            {"he": "עִם", "translit": "Им", "translit_en": "Im", "ru": "С (предлог)"},
-            {"he": "בְּ", "translit": "Бе", "translit_en": "Be", "ru": "В / на (предлог)"},
-            {"he": "לְ", "translit": "Ле", "translit_en": "Le", "ru": "К / для (предлог)"},
-            {"he": "מִן / מִ", "translit": "Мин / Ми", "translit_en": "Min / Mi", "ru": "Из / от (предлог)"},
-            {"he": "עַל", "translit": "Аль", "translit_en": "Al", "ru": "На / о (предлог)"},
-            {"he": "שֶׁל", "translit": "Шель", "translit_en": "Shel", "ru": "Из / принадлежащий"},
-            {"he": "אֶת", "translit": "Эт", "translit_en": "Et", "ru": "Знак прямого дополнения"},
-            {"he": "גַּם", "translit": "Гам", "translit_en": "Gam", "ru": "Тоже / также"},
-            {"he": "רַק", "translit": "Рак", "translit_en": "Rak", "ru": "Только / лишь"},
-            {"he": "כְּבָר", "translit": "Квар", "translit_en": "Kvar", "ru": "Уже"},
-            {"he": "עֲדַיִן", "translit": "Адаин", "translit_en": "Adayin", "ru": "Ещё / пока что"},
-            {"he": "אוּלַי", "translit": "Улай", "translit_en": "Ulay", "ru": "Может быть"},
-            {"he": "אַף פַּעַם", "translit": "Аф паам", "translit_en": "Af pa'am", "ru": "Никогда"},
-            {"he": "תָּמִיד", "translit": "Тамид", "translit_en": "Tamid", "ru": "Всегда"},
-            {"he": "עַכְשָׁו", "translit": "Ахшав", "translit_en": "Achshav", "ru": "Сейчас"},
-            {"he": "אַחַר כָּךְ", "translit": "Ахар ках", "translit_en": "Achar kach", "ru": "Потом / после"},
-            {"he": "לִפְנֵי", "translit": "Лифней", "translit_en": "Lifney", "ru": "Перед / до"},
-            {"he": "טוֹב", "translit": "Тов", "translit_en": "Tov", "ru": "Хорошо / хороший"},
-            {"he": "רַע", "translit": "Ра", "translit_en": "Ra", "ru": "Плохо / плохой"},
-            {"he": "גָּדוֹל", "translit": "Гадоль", "translit_en": "Gadol", "ru": "Большой"},
-            {"he": "קָטָן", "translit": "Катан", "translit_en": "Katan", "ru": "Маленький"},
-            {"he": "חָדָשׁ", "translit": "Хадаш", "translit_en": "Hadash", "ru": "Новый"},
-            {"he": "יָשָׁן", "translit": "Яшан", "translit_en": "Yashan", "ru": "Старый"},
-            {"he": "יָפֶה", "translit": "Яфе", "translit_en": "Yafe", "ru": "Красивый"},
-            {"he": "מָהִיר", "translit": "Махир", "translit_en": "Mahir", "ru": "Быстрый"},
-            {"he": "אִטִּי", "translit": "Ити", "translit_en": "Iti", "ru": "Медленный"},
-            {"he": "קַר", "translit": "Кар", "translit_en": "Kar", "ru": "Холодный"},
-            {"he": "חַם", "translit": "Хам", "translit_en": "Ham", "ru": "Горячий"},
-            {"he": "יוֹם", "translit": "Йом", "translit_en": "Yom", "ru": "День"},
-            {"he": "לַיְלָה", "translit": "Лайла", "translit_en": "Layla", "ru": "Ночь"},
-            {"he": "שָׁעָה", "translit": "Шаа", "translit_en": "Sha'a", "ru": "Час"},
-            {"he": "שָׁבוּעַ", "translit": "Шавуа", "translit_en": "Shavua", "ru": "Неделя"},
-            {"he": "חֹדֶשׁ", "translit": "Ходеш", "translit_en": "Hodesh", "ru": "Месяц"},
-            {"he": "שָׁנָה", "translit": "Шана", "translit_en": "Shana", "ru": "Год"},
-            {"he": "בַּיִת", "translit": "Байт", "translit_en": "Bayit", "ru": "Дом"},
-            {"he": "עִיר", "translit": "Ир", "translit_en": "Ir", "ru": "Город"},
-            {"he": "רְחוֹב", "translit": "Рехов", "translit_en": "Rechov", "ru": "Улица"},
-            {"he": "מְדִינָה", "translit": "Медина", "translit_en": "Medina", "ru": "Страна / государство"},
-            {"he": "אֶרֶץ", "translit": "Эрец", "translit_en": "Eretz", "ru": "Земля / страна"},
-            {"he": "אֲוִיר", "translit": "Авир", "translit_en": "Avir", "ru": "Воздух"},
-            {"he": "מַיִם", "translit": "Маим", "translit_en": "Mayim", "ru": "Вода"},
-            {"he": "אֵשׁ", "translit": "Эш", "translit_en": "Esh", "ru": "Огонь"},
-            {"he": "אָדָם", "translit": "Адам", "translit_en": "Adam", "ru": "Человек / люди"},
-            {"he": "אִישׁ", "translit": "Иш", "translit_en": "Ish", "ru": "Мужчина / муж"},
-            {"he": "אִשָּׁה", "translit": "Иша", "translit_en": "Isha", "ru": "Женщина / жена"},
-            {"he": "יֶלֶד", "translit": "Йелед", "translit_en": "Yeled", "ru": "Ребёнок / мальчик"},
-            {"he": "יַלְדָּה", "translit": "Ялда", "translit_en": "Yalda", "ru": "Девочка"},
-            {"he": "חָבֵר", "translit": "Хавер", "translit_en": "Haver", "ru": "Друг"},
-            {"he": "עֲבוֹדָה", "translit": "Авода", "translit_en": "Avoda", "ru": "Работа"},
-            {"he": "כֶּסֶף", "translit": "Кесеф", "translit_en": "Kesef", "ru": "Деньги / серебро"},
-            {"he": "זְמַן", "translit": "Зман", "translit_en": "Zman", "ru": "Время"},
-            {"he": "מָקוֹם", "translit": "Маком", "translit_en": "Makom", "ru": "Место"},
-            {"he": "דֶּרֶךְ", "translit": "Дерех", "translit_en": "Derech", "ru": "Путь / дорога"},
-            {"he": "חַיִּים", "translit": "Хаим", "translit_en": "Chaim", "ru": "Жизнь"},
-            {"he": "שֵׁם", "translit": "Шем", "translit_en": "Shem", "ru": "Имя"},
-            {"he": "יָד", "translit": "Яд", "translit_en": "Yad", "ru": "Рука"},
-            {"he": "עַיִן", "translit": "Аин", "translit_en": "Ayin", "ru": "Глаз"},
-            {"he": "לֵב", "translit": "Лев", "translit_en": "Lev", "ru": "Сердце"},
-            {"he": "רֹאשׁ", "translit": "Рош", "translit_en": "Rosh", "ru": "Голова"},
-            {"he": "פֶּה", "translit": "Пе", "translit_en": "Pe", "ru": "Рот"},
-            {"he": "אֹכֶל", "translit": "Охель", "translit_en": "Ochel", "ru": "Еда"},
-            {"he": "לֶחֶם", "translit": "Лехем", "translit_en": "Lechem", "ru": "Хлеб"},
-            {"he": "מִלָּה", "translit": "Мила", "translit_en": "Mila", "ru": "Слово"},
-            {"he": "שָׂפָה", "translit": "Сафа", "translit_en": "Safa", "ru": "Язык / губа"},
-            {"he": "שְׁאֵלָה", "translit": "Шеэла", "translit_en": "She'ela", "ru": "Вопрос"},
-            {"he": "תְּשׁוּבָה", "translit": "Тшува", "translit_en": "Teshuva", "ru": "Ответ"},
-            {"he": "בְּעָיָה", "translit": "Беая", "translit_en": "Be'aya", "ru": "Проблема"},
-            {"he": "רַעְיוֹן", "translit": "Раайон", "translit_en": "Ra'ayon", "ru": "Идея"},
-            {"he": "סֵפֶר", "translit": "Сефер", "translit_en": "Sefer", "ru": "Книга"},
-            {"he": "מִכְתָּב", "translit": "Михтав", "translit_en": "Michtav", "ru": "Письмо"},
-            {"he": "אִי-מֵיְל", "translit": "И-мейл", "translit_en": "E-mail", "ru": "Электронная почта"},
-            {"he": "טֶלֶפוֹן", "translit": "Телефон", "translit_en": "Telefon", "ru": "Телефон"},
-            {"he": "מְכוֹנִית", "translit": "Мехонит", "translit_en": "Mechonit", "ru": "Машина / автомобиль"},
-            {"he": "אוֹטוֹבּוּס", "translit": "Отобус", "translit_en": "Otobus", "ru": "Автобус"},
-            {"he": "בֵּית סֵפֶר", "translit": "Бейт сефер", "translit_en": "Beit sefer", "ru": "Школа"},
-            {"he": "בֵּית חוֹלִים", "translit": "Бейт холим", "translit_en": "Beit cholim", "ru": "Больница"},
-            {"he": "חָדָר", "translit": "Хадар", "translit_en": "Chadar", "ru": "Комната"},
-            {"he": "דֶּלֶת", "translit": "Делет", "translit_en": "Delet", "ru": "Дверь"},
-            {"he": "חַלּוֹן", "translit": "Халон", "translit_en": "Chalon", "ru": "Окно"},
-            {"he": "שֻׁלְחָן", "translit": "Шульхан", "translit_en": "Shulchan", "ru": "Стол"},
-            {"he": "כִּסֵּא", "translit": "Кисэ", "translit_en": "Kise", "ru": "Стул"},
-            {"he": "בֶּגֶד", "translit": "Бегед", "translit_en": "Beged", "ru": "Одежда"},
+            {"he": "אֲנִי", "translit": "Ани", "ru": "Я"},
+            {"he": "אַתָּה / אַתְּ", "translit": "Ата / Ат", "ru": "Ты (м/ж)"},
+            {"he": "הוּא", "translit": "Ху", "ru": "Он"},
+            {"he": "הִיא", "translit": "Хи", "ru": "Она"},
+            {"he": "אֲנַחְנוּ", "translit": "Анахну", "ru": "Мы"},
+            {"he": "אַתֶּם / אַתֶּן", "translit": "Атем / Атен", "ru": "Вы (м/ж)"},
+            {"he": "הֵם / הֵן", "translit": "Хем / Хен", "ru": "Они (м/ж)"},
+            {"he": "כֵּן", "translit": "Кен", "ru": "Да"},
+            {"he": "לֹא", "translit": "Ло", "ru": "Нет"},
+            {"he": "מָה", "translit": "Ма", "ru": "Что"},
+            {"he": "מִי", "translit": "Ми", "ru": "Кто"},
+            {"he": "אֵיפֹה", "translit": "Эйфо", "ru": "Где"},
+            {"he": "מָתַי", "translit": "Матай", "ru": "Когда"},
+            {"he": "לָמָּה", "translit": "Лама", "ru": "Почему"},
+            {"he": "אֵיךְ", "translit": "Эйх", "ru": "Как"},
+            {"he": "כַּמָּה", "translit": "Кама", "ru": "Сколько"},
+            {"he": "זֶה / זֹאת", "translit": "Зе / Зот", "ru": "Это (м/ж)"},
+            {"he": "כָּל", "translit": "Коль", "ru": "Всё / каждый"},
+            {"he": "עִם", "translit": "Им", "ru": "С (предлог)"},
+            {"he": "בְּ", "translit": "Бе", "ru": "В / на (предлог)"},
+            {"he": "לְ", "translit": "Ле", "ru": "К / для (предлог)"},
+            {"he": "מִן / מִ", "translit": "Мин / Ми", "ru": "Из / от (предлог)"},
+            {"he": "עַל", "translit": "Аль", "ru": "На / о (предлог)"},
+            {"he": "שֶׁל", "translit": "Шель", "ru": "Из / принадлежащий"},
+            {"he": "אֶת", "translit": "Эт", "ru": "Знак прямого дополнения"},
+            {"he": "גַּם", "translit": "Гам", "ru": "Тоже / также"},
+            {"he": "רַק", "translit": "Рак", "ru": "Только / лишь"},
+            {"he": "כְּבָר", "translit": "Квар", "ru": "Уже"},
+            {"he": "עֲדַיִן", "translit": "Адаин", "ru": "Ещё / пока что"},
+            {"he": "אוּלַי", "translit": "Улай", "ru": "Может быть"},
+            {"he": "אַף פַּעַם", "translit": "Аф паам", "ru": "Никогда"},
+            {"he": "תָּמִיד", "translit": "Тамид", "ru": "Всегда"},
+            {"he": "עַכְשָׁו", "translit": "Ахшав", "ru": "Сейчас"},
+            {"he": "אַחַר כָּךְ", "translit": "Ахар ках", "ru": "Потом / после"},
+            {"he": "לִפְנֵי", "translit": "Лифней", "ru": "Перед / до"},
+            {"he": "טוֹב", "translit": "Тов", "ru": "Хорошо / хороший"},
+            {"he": "רַע", "translit": "Ра", "ru": "Плохо / плохой"},
+            {"he": "גָּדוֹל", "translit": "Гадоль", "ru": "Большой"},
+            {"he": "קָטָן", "translit": "Катан", "ru": "Маленький"},
+            {"he": "חָדָשׁ", "translit": "Хадаш", "ru": "Новый"},
+            {"he": "יָשָׁן", "translit": "Яшан", "ru": "Старый"},
+            {"he": "יָפֶה", "translit": "Яфе", "ru": "Красивый"},
+            {"he": "מָהִיר", "translit": "Махир", "ru": "Быстрый"},
+            {"he": "אִטִּי", "translit": "Ити", "ru": "Медленный"},
+            {"he": "קַר", "translit": "Кар", "ru": "Холодный"},
+            {"he": "חַם", "translit": "Хам", "ru": "Горячий"},
+            {"he": "יוֹם", "translit": "Йом", "ru": "День"},
+            {"he": "לַיְלָה", "translit": "Лайла", "ru": "Ночь"},
+            {"he": "שָׁעָה", "translit": "Шаа", "ru": "Час"},
+            {"he": "שָׁבוּעַ", "translit": "Шавуа", "ru": "Неделя"},
+            {"he": "חֹדֶשׁ", "translit": "Ходеш", "ru": "Месяц"},
+            {"he": "שָׁנָה", "translit": "Шана", "ru": "Год"},
+            {"he": "בַּיִת", "translit": "Байт", "ru": "Дом"},
+            {"he": "עִיר", "translit": "Ир", "ru": "Город"},
+            {"he": "רְחוֹב", "translit": "Рехов", "ru": "Улица"},
+            {"he": "מְדִינָה", "translit": "Медина", "ru": "Страна / государство"},
+            {"he": "אֶרֶץ", "translit": "Эрец", "ru": "Земля / страна"},
+            {"he": "אֲוִיר", "translit": "Авир", "ru": "Воздух"},
+            {"he": "מַיִם", "translit": "Маим", "ru": "Вода"},
+            {"he": "אֵשׁ", "translit": "Эш", "ru": "Огонь"},
+            {"he": "אָדָם", "translit": "Адам", "ru": "Человек / люди"},
+            {"he": "אִישׁ", "translit": "Иш", "ru": "Мужчина / муж"},
+            {"he": "אִשָּׁה", "translit": "Иша", "ru": "Женщина / жена"},
+            {"he": "יֶלֶד", "translit": "Йелед", "ru": "Ребёнок / мальчик"},
+            {"he": "יַלְדָּה", "translit": "Ялда", "ru": "Девочка"},
+            {"he": "חָבֵר", "translit": "Хавер", "ru": "Друг"},
+            {"he": "עֲבוֹדָה", "translit": "Авода", "ru": "Работа"},
+            {"he": "כֶּסֶף", "translit": "Кесеф", "ru": "Деньги / серебро"},
+            {"he": "זְמַן", "translit": "Зман", "ru": "Время"},
+            {"he": "מָקוֹם", "translit": "Маком", "ru": "Место"},
+            {"he": "דֶּרֶךְ", "translit": "Дерех", "ru": "Путь / дорога"},
+            {"he": "חַיִּים", "translit": "Хаим", "ru": "Жизнь"},
+            {"he": "שֵׁם", "translit": "Шем", "ru": "Имя"},
+            {"he": "יָד", "translit": "Яд", "ru": "Рука"},
+            {"he": "עַיִן", "translit": "Аин", "ru": "Глаз"},
+            {"he": "לֵב", "translit": "Лев", "ru": "Сердце"},
+            {"he": "רֹאשׁ", "translit": "Рош", "ru": "Голова"},
+            {"he": "פֶּה", "translit": "Пе", "ru": "Рот"},
+            {"he": "אֹכֶל", "translit": "Охель", "ru": "Еда"},
+            {"he": "לֶחֶם", "translit": "Лехем", "ru": "Хлеб"},
+            {"he": "מִלָּה", "translit": "Мила", "ru": "Слово"},
+            {"he": "שָׂפָה", "translit": "Сафа", "ru": "Язык / губа"},
+            {"he": "שְׁאֵלָה", "translit": "Шеэла", "ru": "Вопрос"},
+            {"he": "תְּשׁוּבָה", "translit": "Тшува", "ru": "Ответ"},
+            {"he": "בְּעָיָה", "translit": "Беая", "ru": "Проблема"},
+            {"he": "רַעְיוֹן", "translit": "Раайон", "ru": "Идея"},
+            {"he": "סֵפֶר", "translit": "Сефер", "ru": "Книга"},
+            {"he": "מִכְתָּב", "translit": "Михтав", "ru": "Письмо"},
+            {"he": "אִי-מֵיְל", "translit": "И-мейл", "ru": "Электронная почта"},
+            {"he": "טֶלֶפוֹן", "translit": "Телефон", "ru": "Телефон"},
+            {"he": "מְכוֹנִית", "translit": "Мехонит", "ru": "Машина / автомобиль"},
+            {"he": "אוֹטוֹבּוּס", "translit": "Отобус", "ru": "Автобус"},
+            {"he": "בֵּית סֵפֶר", "translit": "Бейт сефер", "ru": "Школа"},
+            {"he": "בֵּית חוֹלִים", "translit": "Бейт холим", "ru": "Больница"},
+            {"he": "חָדָר", "translit": "Хадар", "ru": "Комната"},
+            {"he": "דֶּלֶת", "translit": "Делет", "ru": "Дверь"},
+            {"he": "חַלּוֹן", "translit": "Халон", "ru": "Окно"},
+            {"he": "שֻׁלְחָן", "translit": "Шульхан", "ru": "Стол"},
+            {"he": "כִּסֵּא", "translit": "Кисэ", "ru": "Стул"},
+            {"he": "בֶּגֶד", "translit": "Бегед", "ru": "Одежда"},
         ]
     },
 }
 
-# ─── Уроки версии 2: глаголы в трёх временах ─────────────────────────────────
+# ─── Уроки версии 2: глаголы в трёх временах с примерами ─────────────────────────────────
 LESSONS_V2_VERBS = {
     "title": "🔥 Глаголы: 3 времени",
     "phrases": [
-        {"he": "הָיִיתִי / אֶהְיֶה / אֲנִי הָיִיתִי", "translit": "Хайити / Эхье / Хайити", "translit_en": "Hayiti / Ehye / Hayiti", "ru": "Быть — я: был(а) / буду / есмь"},
-        {"he": "הוּא הָיָה / יִהְיֶה / הוּא", "translit": "Ху hая / Йихье / Ху", "translit_en": "Hu haya / Yihye / Hu", "ru": "Быть — он: был / будет / есть"},
-        {"he": "עָשִׂיתִי / אֶעֱשֶׂה / עוֹשֶׂה", "translit": "Асити / Ээсэ / Осэ", "translit_en": "Asiti / E'ese / Ose", "ru": "Делать — я: сделал(а) / сделаю / делаю"},
-        {"he": "הוּא עָשָׂה / יַעֲשֶׂה / עוֹשֶׂה", "translit": "Ху аса / Яасэ / Осэ", "translit_en": "Hu asa / Ya'ase / Ose", "ru": "Делать — он: сделал / сделает / делает"},
-        {"he": "אָמַרְתִּי / אֹמַר / אוֹמֵר", "translit": "Амарти / Омар / Омер", "translit_en": "Amarti / Omar / Omer", "ru": "Говорить — я: сказал(а) / скажу / говорю"},
-        {"he": "הוּא אָמַר / יֹאמַר / אוֹמֵר", "translit": "Ху амар / Йомар / Омер", "translit_en": "Hu amar / Yomar / Omer", "ru": "Говорить — он: сказал / скажет / говорит"},
-        {"he": "הָלַכְתִּי / אֵלֵךְ / הוֹלֵךְ", "translit": "hалахти / Элех / hолех", "translit_en": "Halachti / Elech / Holech", "ru": "Идти — я: пошёл(ла) / пойду / иду"},
-        {"he": "הוּא הָלַךְ / יֵלֵךְ / הוֹלֵךְ", "translit": "Ху hалах / Йелех / hолех", "translit_en": "Hu halach / Yelech / Holech", "ru": "Идти — он: пошёл / пойдёт / идёт"},
-        {"he": "יָדַעְתִּי / אֵדַע / יוֹדֵעַ", "translit": "Ядати / Эда / Йодеа", "translit_en": "Yadati / Eda / Yodea", "ru": "Знать — я: знал(а) / узнаю / знаю"},
-        {"he": "הוּא יָדַע / יֵדַע / יוֹדֵעַ", "translit": "Ху яда / Йеда / Йодеа", "translit_en": "Hu yada / Yeda / Yodea", "ru": "Знать — он: знал / узнает / знает"},
-        {"he": "רָאִיתִי / אֶרְאֶה / רוֹאֶה", "translit": "Раити / Эрэ / Роэ", "translit_en": "Ra'iti / Er'e / Ro'e", "ru": "Видеть — я: видел(а) / увижу / вижу"},
-        {"he": "הוּא רָאָה / יִרְאֶה / רוֹאֶה", "translit": "Ху раа / Йирэ / Роэ", "translit_en": "Hu ra'a / Yir'e / Ro'e", "ru": "Видеть — он: видел / увидит / видит"},
-        {"he": "בָּאתִי / אָבוֹא / בָּא", "translit": "Бати / Аво / Ба", "translit_en": "Bati / Avo / Ba", "ru": "Прийти — я: пришёл(ла) / приду / прихожу"},
-        {"he": "הוּא בָּא / יָבוֹא / בָּא", "translit": "Ху ба / Яво / Ба", "translit_en": "Hu ba / Yavo / Ba", "ru": "Прийти — он: пришёл / придёт / приходит"},
-        {"he": "נָתַתִּי / אֶתֵּן / נוֹתֵן", "translit": "Натати / Этен / Нотен", "translit_en": "Natati / Eten / Noten", "ru": "Давать — я: дал(а) / дам / даю"},
-        {"he": "הוּא נָתַן / יִתֵּן / נוֹתֵן", "translit": "Ху натан / Йитен / Нотен", "translit_en": "Hu natan / Yiten / Noten", "ru": "Давать — он: дал / даст / даёт"},
-        {"he": "דִּבַּרְתִּי / אֲדַבֵּר / מְדַבֵּר", "translit": "Дибарти / Адабер / Медабер", "translit_en": "Dibarti / Adaber / Medaber", "ru": "Разговаривать — я: говорил(а) / буду говорить / говорю"},
-        {"he": "הוּא דִּיבֵּר / יְדַבֵּר / מְדַבֵּר", "translit": "Ху дибер / Йедабер / Медабер", "translit_en": "Hu diber / Yedaber / Medaber", "ru": "Разговаривать — он: говорил / будет говорить / говорит"},
-        {"he": "רָצִיתִי / אֶרְצֶה / רוֹצֶה", "translit": "Рацити / Эрцэ / Роцэ", "translit_en": "Ratziti / Ertze / Rotze", "ru": "Хотеть — я: хотел(а) / захочу / хочу"},
-        {"he": "הוּא רָצָה / יִרְצֶה / רוֹצֶה", "translit": "Ху раца / Йирцэ / Роцэ", "translit_en": "Hu ratza / Yirtze / Rotze", "ru": "Хотеть — он: хотел / захочет / хочет"},
+        {"he": "הָיִיתִי / אֶהְיֶה", "translit": "Хайити / Эхье", "ru": "Быть — я: был(а) / буду", "example": "אני הייתי מורה — Я был учителем"},
+        {"he": "הוּא הָיָה / יִהְיֶה", "translit": "Ху hая / Йихье", "ru": "Быть — он: был / будет", "example": "הוא היה תלמיד — Он был учеником"},
+        {"he": "עָשִׂיתִי / אֶעֱשֶׂה", "translit": "Асити / Ээсэ", "ru": "Делать — я: сделал(а) / сделаю", "example": "עשיתי את העבודה — Я сделал работу"},
+        {"he": "הוּא עָשָׂה / יַעֲשֶׂה", "translit": "Ху аса / Яасэ", "ru": "Делать — он: сделал / сделает", "example": "הוא עשה את זה — Он сделал это"},
+        {"he": "אָמַרְתִּי / אֹמַר", "translit": "Амарти / Омар", "ru": "Говорить — я: сказал(а) / скажу", "example": "אמרתי לו שלום — Я сказал ему привет"},
+        {"he": "הוּא אָמַר / יֹאמַר", "translit": "Ху амар / Йомар", "ru": "Говорить — он: сказал / скажет", "example": "הוא אמר את האמת — Он сказал правду"},
+        {"he": "הָלַכְתִּי / אֵלֵךְ", "translit": "hалахти / Элех", "ru": "Идти — я: пошёл(ла) / пойду", "example": "הלכתי הביתה — Я пошёл домой"},
+        {"he": "הוּא הָלַךְ / יֵלֵךְ", "translit": "Ху hалах / Йелех", "ru": "Идти — он: пошёл / пойдёт", "example": "הוא הלך לעבודה — Он пошёл на работу"},
+        {"he": "יָדַעְתִּי / אֵדַע", "translit": "Ядати / Эда", "ru": "Знать — я: знал(а) / узнаю", "example": "ידעתי את התשובה — Я знал ответ"},
+        {"he": "הוּא יָדַע / יֵדַע", "translit": "Ху яда / Йеда", "ru": "Знать — он: знал / узнает", "example": "הוא ידע את הדרך — Он знал дорогу"},
+        {"he": "רָאִיתִי / אֶרְאֶה", "translit": "Раити / Эрэ", "ru": "Видеть — я: видел(а) / увижу", "example": "ראיתי סרט — Я посмотрел фильм"},
+        {"he": "הוּא רָאָה / יִרְאֶה", "translit": "Ху раа / Йирэ", "ru": "Видеть — он: видел / увидит", "example": "הוא ראה את הים — Он увидел море"},
+        {"he": "בָּאתִי / אָבוֹא", "translit": "Бати / Аво", "ru": "Прийти — я: пришёл(ла) / приду", "example": "באתי מוקדם — Я пришёл рано"},
+        {"he": "הוּא בָּא / יָבוֹא", "translit": "Ху ба / Яво", "ru": "Прийти — он: пришёл / придёт", "example": "הוא בא לבית — Он пришёл домой"},
+        {"he": "נָתַתִּי / אֶתֵּן", "translit": "Натати / Этен", "ru": "Давать — я: дал(а) / дам", "example": "נתתי לו מתנה — Я дал ему подарок"},
+        {"he": "הוּא נָתַן / יִתֵּן", "translit": "Ху натан / Йитен", "ru": "Давать — он: дал / даст", "example": "הוא נתן עצה — Он дал совет"},
+        {"he": "דִּבַּרְתִּי / אֲדַבֵּר", "translit": "Дибарти / Адабер", "ru": "Разговаривать — я: говорил(а) / буду говорить", "example": "דיברתי עם חבר — Я поговорил с другом"},
+        {"he": "הוּא דִּיבֵּר / יְדַבֵּר", "translit": "Ху дибер / Йедабер", "ru": "Разговаривать — он: говорил / будет говорить", "example": "הוא דיבר אתמול — Он говорил вчера"},
+        {"he": "רָצִיתִי / אֶרְצֶה", "translit": "Рацити / Эрцэ", "ru": "Хотеть — я: хотел(а) / захочу", "example": "רציתי לאכול — Я хотел есть"},
+        {"he": "הוּא רָצָה / יִרְצֶה", "translit": "Ху раца / Йирцэ", "ru": "Хотеть — он: хотел / захочет", "example": "הוא רצה לשתות — Он хотел пить"},
     ]
 }
 
 # ─── Числа до 1000 для версии 2 ───────────────────────────────────────────────
 NUMBERS_V2 = [
-    {"he": "אֶחָד", "translit": "Эхад", "translit_en": "Echad", "ru": "1 — Один"},
-    {"he": "שְׁתַּיִם", "translit": "Штаим", "translit_en": "Shtayim", "ru": "2 — Два"},
-    {"he": "שָׁלוֹשׁ", "translit": "Шалош", "translit_en": "Shalosh", "ru": "3 — Три"},
-    {"he": "אַרְבַּע", "translit": "Арба", "translit_en": "Arba", "ru": "4 — Четыре"},
-    {"he": "חָמֵשׁ", "translit": "Хамеш", "translit_en": "Hamesh", "ru": "5 — Пять"},
-    {"he": "שֵׁשׁ", "translit": "Шеш", "translit_en": "Shesh", "ru": "6 — Шесть"},
-    {"he": "שֶׁבַע", "translit": "Шева", "translit_en": "Sheva", "ru": "7 — Семь"},
-    {"he": "שְׁמוֹנֶה", "translit": "Шмоне", "translit_en": "Shmone", "ru": "8 — Восемь"},
-    {"he": "תֵּשַׁע", "translit": "Теша", "translit_en": "Tesha", "ru": "9 — Девять"},
-    {"he": "עֶשֶׂר", "translit": "Эсэр", "translit_en": "Eser", "ru": "10 — Десять"},
-    {"he": "אַחַד עָשָׂר", "translit": "Ахад асар", "translit_en": "Achad asar", "ru": "11 — Одиннадцать"},
-    {"he": "שְׁנֵים עָשָׂר", "translit": "Шнейм асар", "translit_en": "Shneym asar", "ru": "12 — Двенадцать"},
-    {"he": "שְׁלוֹשָׁה עָשָׂר", "translit": "Шлоша асар", "translit_en": "Shloshа asar", "ru": "13 — Тринадцать"},
-    {"he": "אַרְבָּעָה עָשָׂר", "translit": "Арбаа асар", "translit_en": "Arba'a asar", "ru": "14 — Четырнадцать"},
-    {"he": "חֲמִשָּׁה עָשָׂר", "translit": "Хамиша асар", "translit_en": "Chamisha asar", "ru": "15 — Пятнадцать"},
-    {"he": "שִׁשָּׁה עָשָׂר", "translit": "Шиша асар", "translit_en": "Shisha asar", "ru": "16 — Шестнадцать"},
-    {"he": "שִׁבְעָה עָשָׂר", "translit": "Шивъа асар", "translit_en": "Shiv'a asar", "ru": "17 — Семнадцать"},
-    {"he": "שְׁמוֹנָה עָשָׂר", "translit": "Шмона асар", "translit_en": "Shmona asar", "ru": "18 — Восемнадцать"},
-    {"he": "תִּשְׁעָה עָשָׂר", "translit": "Тишъа асар", "translit_en": "Tish'a asar", "ru": "19 — Девятнадцать"},
-    {"he": "עֶשְׂרִים", "translit": "Эсрим", "translit_en": "Esrim", "ru": "20 — Двадцать"},
-    {"he": "שְׁלוֹשִׁים", "translit": "Шлошим", "translit_en": "Shloshim", "ru": "30 — Тридцать"},
-    {"he": "אַרְבָּעִים", "translit": "Арбаим", "translit_en": "Arba'im", "ru": "40 — Сорок"},
-    {"he": "חֲמִשִּׁים", "translit": "Хамишим", "translit_en": "Chamishim", "ru": "50 — Пятьдесят"},
-    {"he": "שִׁשִּׁים", "translit": "Шишим", "translit_en": "Shishim", "ru": "60 — Шестьдесят"},
-    {"he": "שִׁבְעִים", "translit": "Шивъим", "translit_en": "Shiv'im", "ru": "70 — Семьдесят"},
-    {"he": "שְׁמוֹנִים", "translit": "Шмоним", "translit_en": "Shmonim", "ru": "80 — Восемьдесят"},
-    {"he": "תִּשְׁעִים", "translit": "Тишъим", "translit_en": "Tish'im", "ru": "90 — Девяносто"},
-    {"he": "מֵאָה", "translit": "Меа", "translit_en": "Mea", "ru": "100 — Сто"},
-    {"he": "מָאתַיִם", "translit": "Матаим", "translit_en": "Matayim", "ru": "200 — Двести"},
-    {"he": "שְׁלוֹשׁ מֵאוֹת", "translit": "Шлош меот", "translit_en": "Shlosh meot", "ru": "300 — Триста"},
-    {"he": "אַרְבַּע מֵאוֹת", "translit": "Арба меот", "translit_en": "Arba meot", "ru": "400 — Четыреста"},
-    {"he": "חֲמֵשׁ מֵאוֹת", "translit": "Хамеш меот", "translit_en": "Hamesh meot", "ru": "500 — Пятьсот"},
-    {"he": "שֵׁשׁ מֵאוֹת", "translit": "Шеш меот", "translit_en": "Shesh meot", "ru": "600 — Шестьсот"},
-    {"he": "שְׁבַע מֵאוֹת", "translit": "Шва меот", "translit_en": "Shva meot", "ru": "700 — Семьсот"},
-    {"he": "שְׁמוֹנֶה מֵאוֹת", "translit": "Шмоне меот", "translit_en": "Shmone meot", "ru": "800 — Восемьсот"},
-    {"he": "תְּשַׁע מֵאוֹת", "translit": "Тша меот", "translit_en": "Tsha meot", "ru": "900 — Девятьсот"},
-    {"he": "אֶלֶף", "translit": "Элеф", "translit_en": "Elef", "ru": "1000 — Тысяча"},
+    {"he": "אֶחָד", "translit": "Эхад", "ru": "1 — Один"},
+    {"he": "שְׁתַּיִם", "translit": "Штаим", "ru": "2 — Два"},
+    {"he": "שָׁלוֹשׁ", "translit": "Шалош", "ru": "3 — Три"},
+    {"he": "אַרְבַּע", "translit": "Арба", "ru": "4 — Четыре"},
+    {"he": "חָמֵשׁ", "translit": "Хамеш", "ru": "5 — Пять"},
+    {"he": "שֵׁשׁ", "translit": "Шеш", "ru": "6 — Шесть"},
+    {"he": "שֶׁבַע", "translit": "Шева", "ru": "7 — Семь"},
+    {"he": "שְׁמוֹנֶה", "translit": "Шмоне", "ru": "8 — Восемь"},
+    {"he": "תֵּשַׁע", "translit": "Теша", "ru": "9 — Девять"},
+    {"he": "עֶשֶׂר", "translit": "Эсэр", "ru": "10 — Десять"},
+    {"he": "אַחַד עָשָׂר", "translit": "Ахад асар", "ru": "11 — Одиннадцать"},
+    {"he": "שְׁנֵים עָשָׂר", "translit": "Шнейм асар", "ru": "12 — Двенадцать"},
+    {"he": "שְׁלוֹשָׁה עָשָׂר", "translit": "Шлоша асар", "ru": "13 — Тринадцать"},
+    {"he": "אַרְבָּעָה עָשָׂר", "translit": "Арбаа асар", "ru": "14 — Четырнадцать"},
+    {"he": "חֲמִשָּׁה עָשָׂר", "translit": "Хамиша асар", "ru": "15 — Пятнадцать"},
+    {"he": "שִׁשָּׁה עָשָׂר", "translit": "Шиша асар", "ru": "16 — Шестнадцать"},
+    {"he": "שִׁבְעָה עָשָׂר", "translit": "Шивъа асар", "ru": "17 — Семнадцать"},
+    {"he": "שְׁמוֹנָה עָשָׂר", "translit": "Шмона асар", "ru": "18 — Восемнадцать"},
+    {"he": "תִּשְׁעָה עָשָׂר", "translit": "Тишъа асар", "ru": "19 — Девятнадцать"},
+    {"he": "עֶשְׂרִים", "translit": "Эсрим", "ru": "20 — Двадцать"},
+    {"he": "שְׁלוֹשִׁים", "translit": "Шлошим", "ru": "30 — Тридцать"},
+    {"he": "אַרְבָּעִים", "translit": "Арбаим", "ru": "40 — Сорок"},
+    {"he": "חֲמִשִּׁים", "translit": "Хамишим", "ru": "50 — Пятьдесят"},
+    {"he": "שִׁשִּׁים", "translit": "Шишим", "ru": "60 — Шестьдесят"},
+    {"he": "שִׁבְעִים", "translit": "Шивъим", "ru": "70 — Семьдесят"},
+    {"he": "שְׁמוֹנִים", "translit": "Шмоним", "ru": "80 — Восемьдесят"},
+    {"he": "תִּשְׁעִים", "translit": "Тишъим", "ru": "90 — Девяносто"},
+    {"he": "מֵאָה", "translit": "Меа", "ru": "100 — Сто"},
+    {"he": "מָאתַיִם", "translit": "Матаим", "ru": "200 — Двести"},
+    {"he": "שְׁלוֹשׁ מֵאוֹת", "translit": "Шлош меот", "ru": "300 — Триста"},
+    {"he": "אַרְבַּע מֵאוֹת", "translit": "Арба меот", "ru": "400 — Четыреста"},
+    {"he": "חֲמֵשׁ מֵאוֹת", "translit": "Хамеш меот", "ru": "500 — Пятьсот"},
+    {"he": "שֵׁשׁ מֵאוֹת", "translit": "Шеш меот", "ru": "600 — Шестьсот"},
+    {"he": "שְׁבַע מֵאוֹת", "translit": "Шва меот", "ru": "700 — Семьсот"},
+    {"he": "שְׁמוֹנֶה מֵאוֹת", "translit": "Шмоне меот", "ru": "800 — Восемьсот"},
+    {"he": "תְּשַׁע מֵאוֹת", "translit": "Тша меот", "ru": "900 — Девятьсот"},
+    {"he": "אֶלֶף", "translit": "Элеф", "ru": "1000 — Тысяча"},
 ]
 
 # ─── Пулы для тестов ─────────────────────────────────────────────────────────
@@ -528,7 +529,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Добро пожаловать в бот для изучения иврита!\n\n"
         "Выберите версию:\n"
         "• *Версия 1* — транслитерация на русском\n"
-        "• *Версия 2* — транслитерация на русском и английском, глаголы в трёх временах",
+        "• *Версия 2* — транслитерация на русском, глаголы в трёх временах с примерами употребления",
         parse_mode="Markdown",
         reply_markup=buttons
     )
@@ -552,22 +553,19 @@ async def show_phrase(query, lesson_key: str, phrase_idx: int, version: int = 1)
     phrase = lesson["phrases"][phrase_idx]
     total = len(lesson["phrases"])
 
-    if version == 2:
-        translit_line = (
-            f"🔤 *Транслитерация:*\n"
-            f"_{phrase['translit']}_\n"
-            f"_{phrase.get('translit_en', '')}_ 🇬🇧"
-        )
-    else:
-        translit_line = f"🔤 *Транслитерация:*\n_{phrase['translit']}_"
-
+    # Базовая информация
     text = (
         f"{lesson['title']} — фраза {phrase_idx + 1}/{total}\n\n"
         f"🇮🇱 *Иврит:*\n"
         f"```\n{phrase['he']}\n```\n\n"
-        f"{translit_line}\n\n"
+        f"🔤 *Транслитерация:*\n_{phrase['translit']}_\n\n"
         f"🇷🇺 *По-русски:*\n{phrase['ru']}"
     )
+
+    # Добавляем пример в версии 2
+    if version == 2 and "example" in phrase and phrase["example"]:
+        text += f"\n\n📝 *Пример:*\n_{phrase['example']}_"
+
     await query.edit_message_text(
         text,
         parse_mode="Markdown",
@@ -586,7 +584,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if version == 1:
             desc = "транслитерация на *русском*"
         else:
-            desc = "транслитерация на *русском и английском*, глаголы в трёх временах"
+            desc = "транслитерация на *русском*, глаголы в трёх временах с примерами употребления"
         await query.edit_message_text(
             f"✅ *Версия {version}* выбрана — {desc}!\n\n"
             "Здесь вы найдёте:\n"
@@ -612,16 +610,22 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("audio_"):
         _, lesson_key, idx = data.split("_", 2)
-        phrase = LESSONS[lesson_key]["phrases"][int(idx)]
+        if version == 2 and lesson_key == "food":
+            phrase = LESSONS_V2_VERBS["phrases"][int(idx)]
+        else:
+            phrase = LESSONS[lesson_key]["phrases"][int(idx)]
         he_text = phrase["he"]
         
         await query.answer("🔊 Генерирую произношение...", show_alert=False)
         
         try:
             audio_bytes = get_hebrew_tts(he_text)
+            caption = f"🇮🇱 {he_text}\n👄 {phrase['translit']}\n🇷🇺 {phrase['ru']}"
+            if "example" in phrase and phrase["example"]:
+                caption += f"\n📝 {phrase['example']}"
             await query.message.reply_voice(
                 voice=io.BytesIO(audio_bytes),
-                caption=f"🇮🇱 {he_text}\n👄 {phrase['translit']}\n🇷🇺 {phrase['ru']}",
+                caption=caption,
                 parse_mode="Markdown"
             )
         except Exception as e:
@@ -649,7 +653,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("checkpron_"):
         _, lesson_key, idx = data.split("_", 2)
-        phrase = LESSONS[lesson_key]["phrases"][int(idx)]
+        version = get_user(user_id).get("version", 1)
+        if version == 2 and lesson_key == "food":
+            phrase = LESSONS_V2_VERBS["phrases"][int(idx)]
+        else:
+            phrase = LESSONS[lesson_key]["phrases"][int(idx)]
         context.user_data["pron_check"] = {
             "lesson_key": lesson_key,
             "phrase_idx": int(idx),
@@ -766,17 +774,18 @@ async def send_quiz_question(message, user_id: int, context, quiz_type: str = "w
     context.user_data["quiz_phrase"] = correct
     context.user_data["quiz_type"] = quiz_type
 
-    translit_show = correct["translit"]
-    if version == 2 and "translit_en" in correct:
-        translit_show += f" / {correct['translit_en']}"
+    text = f"{title}\n\nКак переводится:\n\n🇮🇱 _{correct['he']}_\n🔤 ({correct['translit']})\n\n"
+    
+    # Добавляем пример для версии 2
+    if version == 2 and "example" in correct and correct["example"]:
+        text += f"📝 *Пример:* {correct['example']}\n\n"
+    
+    text += "Выберите правильный перевод:"
 
     buttons = [[InlineKeyboardButton(opt["ru"], callback_data=f"quiz_{i}")] for i, opt in enumerate(all_options)]
 
     await message.reply_text(
-        f"{title}\n\nКак переводится:\n\n"
-        f"🇮🇱 _{correct['he']}_\n"
-        f"🔤 ({translit_show})\n\n"
-        f"Выберите правильный перевод:",
+        text,
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(buttons)
     )
@@ -802,15 +811,14 @@ async def handle_quiz_answer(query, user_id: int, data: str, context):
     else:
         result = "❌ *Неправильно.*\n\n"
 
-    translit_show = correct_phrase.get("translit", "")
-    if version == 2 and "translit_en" in correct_phrase:
-        translit_show += f" / {correct_phrase['translit_en']}"
-
     result += (
         f"🇮🇱 {correct_phrase.get('he', '')}\n"
-        f"🔤 {translit_show}\n"
+        f"🔤 {correct_phrase.get('translit', '')}\n"
         f"🇷🇺 {correct_phrase.get('ru', '')}"
     )
+
+    if version == 2 and "example" in correct_phrase and correct_phrase["example"]:
+        result += f"\n\n📝 {correct_phrase['example']}"
 
     update_user(user_id, {"quiz_score": quiz_score, "quiz_total": quiz_total})
     context.user_data.pop("quiz_correct", None)
@@ -942,10 +950,12 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reminders = user.get("reminders", True)
     status = "включены ✅" if reminders else "выключены ❌"
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton(
-            "🔔 Выключить напоминания" if reminders else "🔔 Включить напоминания",
-            callback_data="toggle_reminders"
-        )],
+        [
+            InlineKeyboardButton(
+                "🔔 Выключить напоминания" if reminders else "🔔 Включить напоминания",
+                callback_data="toggle_reminders"
+            )
+        ],
         [InlineKeyboardButton("🗑 Сбросить прогресс", callback_data="reset_progress")],
     ])
     await update.message.reply_text(
