@@ -31,7 +31,6 @@ def _ensure_package(package: str):
     except ImportError:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package, "-q"])
 
-_ensure_package("groq")
 _ensure_package("gtts")
 
 from telegram import (
@@ -78,7 +77,6 @@ TELEGRAM_TOKEN = (
 ).strip()
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 
 logger.info(f"TELEGRAM_TOKEN найден: {'ДА' if TELEGRAM_TOKEN else 'НЕТ'}")
 logger.info(f"ANTHROPIC_API_KEY найден: {'ДА' if ANTHROPIC_API_KEY else 'НЕТ'}")
@@ -158,13 +156,6 @@ def get_hebrew_tts_google(text: str) -> bytes:
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return resp.read()
-
-# ─── Функция для удаления огласовок ──────────────────────────────────────────
-def remove_niqqud(text: str) -> str:
-    """Удаляет огласовки (никуд) из ивритского текста"""
-    import re
-    # Диапазон Unicode для огласовок: \u0591-\u05C7
-    return re.sub(r'[\u0591-\u05C7]', '', text)
 
 # ─── УРОВЕНЬ 1 ────────────────────────────────────────────────────────────────
 
@@ -881,11 +872,42 @@ async def show_phrase(query, lesson_key: str, phrase_idx: int, version: int = 1,
         await query.edit_message_text("❌ Урок не найден.")
         return
     
-    phrase = lesson["phrases"][phrase_idx]
-    total = len(lesson["phrases"])
-
+    # Получаем выученные фразы пользователя
+    user_data = get_user(query.from_user.id)
+    learned = user_data.get("learned", [])
+    
+    # Получаем все фразы урока
+    all_phrases = lesson["phrases"]
+    total = len(all_phrases)
+    
+    # Находим следующий невыученный индекс
+    current_idx = phrase_idx
+    while current_idx < total:
+        key = f"{lesson_key}_{current_idx}"
+        if key not in learned:
+            break
+        current_idx += 1
+    
+    # Если все фразы выучены
+    if current_idx >= total:
+        await query.edit_message_text(
+            f"🎉 *Поздравляю!* Вы выучили все фразы в этом уроке!\n\n"
+            f"📚 {lesson['title']} — полностью завершён! 🌟\n\n"
+            f"Выберите другой урок или вернитесь в меню.",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("📚 Другой урок", callback_data="go_lessons")],
+                [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+            ])
+        )
+        return
+    
+    # Показываем текущую невыученную фразу
+    phrase = all_phrases[current_idx]
+    remaining = total - len([k for k in learned if k.startswith(f"{lesson_key}_")])
+    
     text = (
-        f"{lesson['title']} — фраза {phrase_idx + 1}/{total}\n\n"
+        f"{lesson['title']} — осталось {remaining} фраз\n\n"
         f"🇮🇱 *Иврит:*\n"
         f"```\n{phrase['he']}\n```\n\n"
         f"🔤 *Транслитерация:*\n_{phrase['translit']}_\n\n"
@@ -899,7 +921,7 @@ async def show_phrase(query, lesson_key: str, phrase_idx: int, version: int = 1,
     await query.edit_message_text(
         text,
         parse_mode="Markdown",
-        reply_markup=phrase_keyboard(lesson_key, phrase_idx, total, version, level)
+        reply_markup=phrase_keyboard(lesson_key, current_idx, total, version, level)
     )
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1055,36 +1077,18 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         learned = user_data.get("learned", [])
         total_phrases = user_data.get("total_phrases", 0)
         
-        lesson = get_lesson_by_key(version, level, lesson_key)
-        if not lesson:
-            await query.answer("❌ Урок не найден")
-            return
-        total = len(lesson["phrases"])
-        next_idx = phrase_idx + 1
-        
         if key not in learned:
             learned.append(key)
             total_phrases += 1
             update_user(user_id, {"learned": learned, "total_phrases": total_phrases})
             await query.answer("✅ Отлично! Фраза добавлена в выученные!", show_alert=False)
             
-            if next_idx < total:
-                await show_phrase(query, lesson_key, next_idx, version, level)
-            else:
-                await query.edit_message_text(
-                    f"🎉 *Поздравляю!* Вы выучили все фразы в этом уроке!\n\n"
-                    f"📚 {lesson['title']} — завершён!\n\n"
-                    f"Выберите другой урок или вернитесь в меню.",
-                    parse_mode="Markdown",
-                    reply_markup=InlineKeyboardMarkup([
-                        [InlineKeyboardButton("📚 Другой урок", callback_data="go_lessons")],
-                        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-                    ])
-                )
+            # Показываем следующую невыученную фразу
+            await show_phrase(query, lesson_key, phrase_idx + 1, version, level)
         else:
             await query.answer("Вы уже выучили эту фразу! 🌟", show_alert=False)
-            if next_idx < total:
-                await show_phrase(query, lesson_key, next_idx, version, level)
+            # Показываем следующую невыученную фразу
+            await show_phrase(query, lesson_key, phrase_idx + 1, version, level)
 
     elif data == "main_menu":
         await query.edit_message_text(
