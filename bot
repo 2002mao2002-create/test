@@ -577,6 +577,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     data = query.data
     user_id = query.from_user.id
+    version = get_user(user_id).get("version", 1)
 
     if data.startswith("set_version_"):
         version = int(data.split("_")[-1])
@@ -600,12 +601,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("lesson_"):
         lesson_key = data[7:]
         context.user_data["lesson"] = lesson_key
-        version = get_user(user_id).get("version", 1)
         await show_phrase(query, lesson_key, 0, version)
 
     elif data.startswith("phrase_"):
         _, lesson_key, idx = data.split("_", 2)
-        version = get_user(user_id).get("version", 1)
         await show_phrase(query, lesson_key, int(idx), version)
 
     elif data.startswith("audio_"):
@@ -643,17 +642,43 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = get_user(user_id)
         learned = user.get("learned", [])
         total_phrases = user.get("total_phrases", 0)
+        
+        # Получаем общее количество фраз в уроке
+        if version == 2 and lesson_key == "food":
+            lesson = LESSONS_V2_VERBS
+        else:
+            lesson = LESSONS[lesson_key]
+        total = len(lesson["phrases"])
+        next_idx = int(idx) + 1
+        
         if key not in learned:
             learned.append(key)
             total_phrases += 1
             update_user(user_id, {"learned": learned, "total_phrases": total_phrases})
             await query.answer("✅ Отлично! Фраза добавлена в выученные!", show_alert=False)
+            
+            # Автоматически переходим к следующей фразе
+            if next_idx < total:
+                await show_phrase(query, lesson_key, next_idx, version)
+            else:
+                await query.edit_message_text(
+                    f"🎉 *Поздравляю!* Вы выучили все фразы в этом уроке!\n\n"
+                    f"📚 {lesson['title']} — завершён!\n\n"
+                    f"Выберите другой урок или вернитесь в меню.",
+                    parse_mode="Markdown",
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("📚 Другой урок", callback_data="go_lessons")],
+                        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+                    ])
+                )
         else:
             await query.answer("Вы уже выучили эту фразу! 🌟", show_alert=False)
+            # Всё равно переходим к следующей
+            if next_idx < total:
+                await show_phrase(query, lesson_key, next_idx, version)
 
     elif data.startswith("checkpron_"):
         _, lesson_key, idx = data.split("_", 2)
-        version = get_user(user_id).get("version", 1)
         if version == 2 and lesson_key == "food":
             phrase = LESSONS_V2_VERBS["phrases"][int(idx)]
         else:
@@ -692,11 +717,21 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     elif data == "go_lessons":
-        await query.edit_message_text("📚 Выберите тему:", reply_markup=lessons_keyboard())
+        await query.edit_message_text("📚 Выберите тему:", reply_markup=lessons_keyboard(version))
+
+    elif data == "go_quiz":
+        await query.edit_message_text(
+            "🎯 *Выберите тест:*",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🎯 Тест глаголы", callback_data="quiz_type_verbs")],
+                [InlineKeyboardButton("🎯 Тест слова", callback_data="quiz_type_words")],
+            ] + ([ [InlineKeyboardButton("🔢 Тест числа", callback_data="quiz_type_numbers")] ] if version == 2 else []))
+        )
 
     elif data.startswith("quiz_type_"):
         quiz_type = data[len("quiz_type_"):]
-        await send_quiz_question(query.message, user_id, context, quiz_type)
+        await send_quiz_question(query, user_id, context, quiz_type)
 
     elif data.startswith("quiz_"):
         await handle_quiz_answer(query, user_id, data, context)
@@ -747,7 +782,7 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(buttons)
     )
 
-async def send_quiz_question(message, user_id: int, context, quiz_type: str = "words"):
+async def send_quiz_question(query, user_id: int, context, quiz_type: str = "words"):
     version = get_user(user_id).get("version", 1)
 
     if quiz_type == "verbs":
@@ -761,7 +796,7 @@ async def send_quiz_question(message, user_id: int, context, quiz_type: str = "w
         title = "📖 Тест: слова"
 
     if len(pool) < 4:
-        await message.reply_text("Недостаточно фраз для теста.")
+        await query.edit_message_text("Недостаточно фраз для теста.")
         return
 
     correct = random.choice(pool)
@@ -773,10 +808,114 @@ async def send_quiz_question(message, user_id: int, context, quiz_type: str = "w
     context.user_data["quiz_correct"] = correct_pos
     context.user_data["quiz_phrase"] = correct
     context.user_data["quiz_type"] = quiz_type
+    context.user_data["quiz_pool"] = pool  # Сохраняем пул для следующих вопросов
 
     text = f"{title}\n\nКак переводится:\n\n🇮🇱 _{correct['he']}_\n🔤 ({correct['translit']})\n\n"
     
     # Добавляем пример для версии 2
+    if version == 2 and "example" in correct and correct["example"]:
+        text += f"📝 *Пример:* {correct['example']}\n\n"
+    
+    text += "Выберите правильный перевод:"
+
+    buttons = [[InlineKeyboardButton(opt["ru"], callback_data=f"quiz_{i}")] for i, opt in enumerate(all_options)]
+
+    await query.edit_message_text(
+        text,
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
+
+async def handle_quiz_answer(query, user_id: int, data: str, context):
+    chosen = int(data.split("_")[1])
+    correct_pos = context.user_data.get("quiz_correct")
+    correct_phrase = context.user_data.get("quiz_phrase", {})
+    quiz_type = context.user_data.get("quiz_type", "words")
+    pool = context.user_data.get("quiz_pool", [])
+
+    if correct_pos is None:
+        await query.edit_message_text("Начните тест заново — нажмите кнопку теста")
+        return
+
+    version = get_user(user_id).get("version", 1)
+    user = get_user(user_id)
+    quiz_total = user.get("quiz_total", 0) + 1
+    quiz_score = user.get("quiz_score", 0)
+
+    is_correct = (chosen == correct_pos)
+    if is_correct:
+        quiz_score += 1
+
+    update_user(user_id, {"quiz_score": quiz_score, "quiz_total": quiz_total})
+
+    # Показываем результат и сразу следующий вопрос
+    result = "✅ *Правильно!*" if is_correct else "❌ *Неправильно.*"
+    result += f"\n\n🇮🇱 {correct_phrase.get('he', '')}\n"
+    result += f"🔤 {correct_phrase.get('translit', '')}\n"
+    result += f"🇷🇺 {correct_phrase.get('ru', '')}"
+
+    if version == 2 and "example" in correct_phrase and correct_phrase["example"]:
+        result += f"\n\n📝 {correct_phrase['example']}"
+
+    # Сохраняем результат для показа, затем задаём следующий вопрос
+    context.user_data["last_result"] = result
+    
+    # Генерируем следующий вопрос
+    if pool and len(pool) >= 4:
+        # Удаляем использованную фразу из пула
+        remaining = [p for p in pool if p["he"] != correct_phrase["he"]]
+        if len(remaining) >= 4:
+            context.user_data["quiz_pool"] = remaining
+            # Показываем результат, затем новый вопрос
+            await query.edit_message_text(result, parse_mode="Markdown")
+            # Отправляем новый вопрос отдельным сообщением
+            await send_next_quiz_question(query.message, user_id, context, quiz_type, remaining)
+            return
+
+    # Если фраз мало или это был последний вопрос
+    context.user_data.pop("quiz_correct", None)
+    context.user_data.pop("quiz_phrase", None)
+    context.user_data.pop("quiz_pool", None)
+
+    buttons = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔄 Новый тест", callback_data=f"quiz_type_{quiz_type}")],
+        [InlineKeyboardButton("📊 Мой счёт", callback_data="show_score")],
+        [InlineKeyboardButton("🏠 Меню", callback_data="main_menu")],
+    ])
+    await query.edit_message_text(
+        f"{result}\n\n🎯 Тест завершён!",
+        parse_mode="Markdown",
+        reply_markup=buttons
+    )
+
+async def send_next_quiz_question(message, user_id: int, context, quiz_type: str, pool: list):
+    """Отправляет следующий вопрос теста"""
+    version = get_user(user_id).get("version", 1)
+
+    if len(pool) < 4:
+        await message.reply_text("✅ Тест завершён! Вы ответили на все вопросы.")
+        return
+
+    correct = random.choice(pool)
+    wrong_options = random.sample([p for p in pool if p["he"] != correct["he"]], 3)
+    all_options = [correct] + wrong_options
+    random.shuffle(all_options)
+    correct_pos = next(i for i, p in enumerate(all_options) if p["he"] == correct["he"])
+
+    context.user_data["quiz_correct"] = correct_pos
+    context.user_data["quiz_phrase"] = correct
+    context.user_data["quiz_type"] = quiz_type
+    context.user_data["quiz_pool"] = pool
+
+    if quiz_type == "verbs":
+        title = "🔥 Тест: глаголы"
+    elif quiz_type == "numbers":
+        title = "🔢 Тест: числа"
+    else:
+        title = "📖 Тест: слова"
+
+    text = f"{title}\n\nКак переводится:\n\n🇮🇱 _{correct['he']}_\n🔤 ({correct['translit']})\n\n"
+    
     if version == 2 and "example" in correct and correct["example"]:
         text += f"📝 *Пример:* {correct['example']}\n\n"
     
@@ -790,53 +929,13 @@ async def send_quiz_question(message, user_id: int, context, quiz_type: str = "w
         reply_markup=InlineKeyboardMarkup(buttons)
     )
 
-async def handle_quiz_answer(query, user_id: int, data: str, context):
-    chosen = int(data.split("_")[1])
-    correct_pos = context.user_data.get("quiz_correct")
-    correct_phrase = context.user_data.get("quiz_phrase", {})
-    quiz_type = context.user_data.get("quiz_type", "words")
-
-    if correct_pos is None:
-        await query.edit_message_text("Начните тест заново — нажмите кнопку теста")
-        return
-
-    version = get_user(user_id).get("version", 1)
-    user = get_user(user_id)
-    quiz_total = user.get("quiz_total", 0) + 1
-    quiz_score = user.get("quiz_score", 0)
-
-    if chosen == correct_pos:
-        quiz_score += 1
-        result = "✅ *Правильно!*\n\n"
-    else:
-        result = "❌ *Неправильно.*\n\n"
-
-    result += (
-        f"🇮🇱 {correct_phrase.get('he', '')}\n"
-        f"🔤 {correct_phrase.get('translit', '')}\n"
-        f"🇷🇺 {correct_phrase.get('ru', '')}"
-    )
-
-    if version == 2 and "example" in correct_phrase and correct_phrase["example"]:
-        result += f"\n\n📝 {correct_phrase['example']}"
-
-    update_user(user_id, {"quiz_score": quiz_score, "quiz_total": quiz_total})
-    context.user_data.pop("quiz_correct", None)
-    context.user_data.pop("quiz_phrase", None)
-
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎯 Ещё вопрос", callback_data=f"next_quiz_{quiz_type}")],
-        [InlineKeyboardButton("📊 Мой счёт", callback_data="show_score")],
-    ])
-    await query.edit_message_text(result, parse_mode="Markdown", reply_markup=buttons)
-
 async def next_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
     if data.startswith("next_quiz_"):
         quiz_type = data[len("next_quiz_"):]
-        await send_quiz_question(query.message, query.from_user.id, context, quiz_type)
+        await send_quiz_question(query, query.from_user.id, context, quiz_type)
     elif data == "show_score":
         user = get_user(query.from_user.id)
         score = user.get("quiz_score", 0)
@@ -926,11 +1025,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "📚 Уроки":
         await lessons_menu(update, context)
     elif text == "🎯 Тест глаголы":
-        await send_quiz_question(update.message, user_id, context, "verbs")
+        # Создаём временное сообщение для теста
+        await update.message.reply_text("🔄 Загрузка теста...")
+        # Используем последнее сообщение для отправки вопроса
+        context.user_data["quiz_type"] = "verbs"
+        await send_quiz_question_to_message(update.message, user_id, context, "verbs")
     elif text == "🎯 Тест слова":
-        await send_quiz_question(update.message, user_id, context, "words")
+        await update.message.reply_text("🔄 Загрузка теста...")
+        context.user_data["quiz_type"] = "words"
+        await send_quiz_question_to_message(update.message, user_id, context, "words")
     elif text == "🔢 Тест числа":
-        await send_quiz_question(update.message, user_id, context, "numbers")
+        await update.message.reply_text("🔄 Загрузка теста...")
+        context.user_data["quiz_type"] = "numbers"
+        await send_quiz_question_to_message(update.message, user_id, context, "numbers")
     elif text == "🎯 Тест":
         await quiz(update, context)
     elif text == "📊 Мой прогресс":
@@ -944,6 +1051,50 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Выберите раздел в меню ниже 👇",
             reply_markup=get_menu_keyboard(user_id)
         )
+
+async def send_quiz_question_to_message(message, user_id: int, context, quiz_type: str = "words"):
+    """Отправляет вопрос теста в обычное сообщение (не callback)"""
+    version = get_user(user_id).get("version", 1)
+
+    if quiz_type == "verbs":
+        pool = get_quiz_pool_verbs(version)
+        title = "🔥 Тест: глаголы"
+    elif quiz_type == "numbers":
+        pool = NUMBERS_V2
+        title = "🔢 Тест: числа"
+    else:
+        pool = get_quiz_pool_words(version)
+        title = "📖 Тест: слова"
+
+    if len(pool) < 4:
+        await message.reply_text("Недостаточно фраз для теста.")
+        return
+
+    correct = random.choice(pool)
+    wrong_options = random.sample([p for p in pool if p["he"] != correct["he"]], 3)
+    all_options = [correct] + wrong_options
+    random.shuffle(all_options)
+    correct_pos = next(i for i, p in enumerate(all_options) if p["he"] == correct["he"])
+
+    context.user_data["quiz_correct"] = correct_pos
+    context.user_data["quiz_phrase"] = correct
+    context.user_data["quiz_type"] = quiz_type
+    context.user_data["quiz_pool"] = pool
+
+    text = f"{title}\n\nКак переводится:\n\n🇮🇱 _{correct['he']}_\n🔤 ({correct['translit']})\n\n"
+    
+    if version == 2 and "example" in correct and correct["example"]:
+        text += f"📝 *Пример:* {correct['example']}\n\n"
+    
+    text += "Выберите правильный перевод:"
+
+    buttons = [[InlineKeyboardButton(opt["ru"], callback_data=f"quiz_{i}")] for i, opt in enumerate(all_options)]
+
+    await message.reply_text(
+        text,
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
 
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = get_user(update.effective_user.id)
