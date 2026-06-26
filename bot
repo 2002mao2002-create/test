@@ -159,58 +159,6 @@ def get_hebrew_tts_google(text: str) -> bytes:
     with urllib.request.urlopen(req, timeout=15) as resp:
         return resp.read()
 
-# ─── Groq Whisper STT для проверки произношения (бесплатно) ──────────────────
-def transcribe_audio_whisper(audio_bytes: bytes) -> str:
-    """Транскрибирует аудио через Groq SDK"""
-    if not GROQ_API_KEY:
-        raise RuntimeError("GROQ_API_KEY не задан")
-
-    from groq import Groq
-    client = Groq(api_key=GROQ_API_KEY)
-
-    # Пробуем разные форматы
-    try:
-        transcription = client.audio.transcriptions.create(
-            file=("voice.ogg", audio_bytes, "audio/ogg"),
-            model="whisper-large-v3-turbo",
-            language="he",
-            response_format="json",
-        )
-        return (transcription.text or "").strip()
-    except Exception as e:
-        logger.error(f"Whisper error with ogg: {e}")
-        # Пробуем как mp3
-        try:
-            transcription = client.audio.transcriptions.create(
-                file=("voice.mp3", audio_bytes, "audio/mp3"),
-                model="whisper-large-v3-turbo",
-                language="he",
-                response_format="json",
-            )
-            return (transcription.text or "").strip()
-        except Exception as e2:
-            logger.error(f"Whisper error with mp3: {e2}")
-            raise
-
-def evaluate_pronunciation(transcribed: str, correct_he: str, correct_translit: str, correct_ru: str) -> str:
-    """Оценивает произношение через Claude"""
-    system = """Ты — преподаватель иврита. Твоя задача — оценить произношение студента.
-Тебе дадут: что студент произнёс (транскрипция Whisper на иврите), и правильное слово/фразу.
-Оцени точность произношения по шкале от 1 до 5 звёзд.
-Дай краткий, добрый и конструктивный фидбек на русском языке.
-Ответь строго в формате:
-ОЦЕНКА: ⭐⭐⭐ (от 1 до 5 звёзд)
-ФИДБЕК: (1-2 предложения)
-СОВЕТ: (короткий совет по улучшению, если нужно)"""
-
-    user_text = (
-        f"Студент произнёс (распознано Whisper): «{transcribed}»\n"
-        f"Правильное слово на иврите: {correct_he}\n"
-        f"Правильная транслитерация: {correct_translit}\n"
-        f"Перевод: {correct_ru}"
-    )
-    return call_claude(system, user_text, max_tokens=300)
-
 # ─── Функция для удаления огласовок ──────────────────────────────────────────
 def remove_niqqud(text: str) -> str:
     """Удаляет огласовки (никуд) из ивритского текста"""
@@ -824,14 +772,10 @@ def main_menu_keyboard(version: int = 1, level: int = 1):
         ["🎯 Тест глаголы", "🎯 Тест слова"],
         ["💡 Совет дня", "⚙️ Настройки"],
     ]
-    if version == 2:
-        if level >= 2:
-            buttons.insert(2, ["🔢 Тест числа"])
-        else:
-            buttons.insert(2, ["🔢 Тест числа"])
+    if level >= 2:
+        buttons.insert(2, ["🔢 Тест числа"])
     else:
-        if level >= 2:
-            buttons.insert(2, ["🔢 Тест числа"])
+        buttons.insert(2, ["🔢 Тест числа"])
     
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
@@ -867,17 +811,13 @@ def phrase_keyboard(lesson_key: str, phrase_idx: int, total: int, version: int =
         InlineKeyboardButton("🔊 Произношение", callback_data=f"audio_{lesson_key}_{phrase_idx}"),
         InlineKeyboardButton("✅ Выучил!", callback_data=f"learned_{lesson_key}_{phrase_idx}"),
     ]
-    row3 = [
-        InlineKeyboardButton("🎤 Проверить произношение", callback_data=f"checkpron_{lesson_key}_{phrase_idx}"),
-    ]
-    row4 = [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+    row3 = [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
 
     rows = []
     if row1:
         rows.append(row1)
     rows.append(row2)
     rows.append(row3)
-    rows.append(row4)
     return InlineKeyboardMarkup(rows)
 
 # ─── Handlers ─────────────────────────────────────────────────────────────────
@@ -1146,49 +1086,6 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if next_idx < total:
                 await show_phrase(query, lesson_key, next_idx, version, level)
 
-    elif data.startswith("checkpron_"):
-        # Парсим: checkpron_lesson_key_idx
-        parts = data.split("_")
-        if len(parts) < 3:
-            await query.answer("❌ Ошибка: неверный формат")
-            return
-        lesson_key = "_".join(parts[1:-1])
-        idx_str = parts[-1]
-        try:
-            phrase_idx = int(idx_str)
-        except ValueError:
-            await query.answer("❌ Ошибка: неверный индекс")
-            return
-        
-        lesson = get_lesson_by_key(version, level, lesson_key)
-        if not lesson:
-            await query.answer("❌ Урок не найден")
-            return
-        phrase = lesson["phrases"][phrase_idx]
-        context.user_data["pron_check"] = {
-            "lesson_key": lesson_key,
-            "phrase_idx": phrase_idx,
-            "he": phrase["he"],
-            "translit": phrase["translit"],
-            "ru": phrase["ru"],
-        }
-        if not GROQ_API_KEY:
-            await query.message.reply_text(
-                "⚠️ Для проверки произношения нужен *GROQ\\_API\\_KEY*\\.\n"
-                "Получите бесплатно на console\\.groq\\.com",
-                parse_mode="MarkdownV2"
-            )
-            return
-        await query.message.reply_text(
-            f"🎤 *Проверка произношения*\n\n"
-            f"Произнесите это слово/фразу голосовым сообщением:\n\n"
-            f"🇮🇱 *{phrase['he']}*\n"
-            f"🔤 _{phrase['translit']}_\n"
-            f"🇷🇺 {phrase['ru']}\n\n"
-            f"_Запишите голосовое сообщение и отправьте его сюда_ 👇",
-            parse_mode="Markdown"
-        )
-
     elif data == "main_menu":
         await query.edit_message_text(
             "Выберите раздел 👇",
@@ -1446,70 +1343,6 @@ async def next_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
             parse_mode="Markdown"
         )
 
-async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    pron_data = context.user_data.get("pron_check")
-
-    if not pron_data:
-        await update.message.reply_text(
-            "Чтобы проверить произношение, сначала выберите слово в уроке и нажмите *🎤 Проверить произношение*.",
-            parse_mode="Markdown"
-        )
-        return
-
-    await update.message.chat.send_action("typing")
-    await update.message.reply_text("⏳ Анализирую произношение...")
-
-    try:
-        voice = update.message.voice
-        file = await context.bot.get_file(voice.file_id)
-        audio_bytes = await file.download_as_bytearray()
-
-        loop = asyncio.get_event_loop()
-
-        transcribed = await loop.run_in_executor(
-            None, lambda: transcribe_audio_whisper(bytes(audio_bytes))
-        )
-
-        if not transcribed:
-            await update.message.reply_text(
-                "😕 Не удалось распознать речь. Попробуйте говорить чётче и ближе к микрофону."
-            )
-            return
-
-        feedback = await loop.run_in_executor(
-            None, lambda: evaluate_pronunciation(
-                transcribed,
-                pron_data["he"],
-                pron_data["translit"],
-                pron_data["ru"],
-            )
-        )
-
-        result_text = (
-            f"🎤 *Результат проверки произношения*\n\n"
-            f"🇮🇱 Слово: *{pron_data['he']}*\n"
-            f"🔤 Правильно: _{pron_data['translit']}_\n"
-            f"🗣 Распознано: _{transcribed}_\n\n"
-            f"{feedback}"
-        )
-
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔄 Попробовать ещё раз", callback_data=f"checkpron_{pron_data['lesson_key']}_{pron_data['phrase_idx']}")],
-            [InlineKeyboardButton("▶️ Продолжить урок", callback_data=f"phrase_{pron_data['lesson_key']}_{pron_data['phrase_idx']}")],
-        ])
-
-        await update.message.reply_text(result_text, parse_mode="Markdown", reply_markup=buttons)
-        context.user_data.pop("pron_check", None)
-
-    except Exception as e:
-        logger.error(f"Voice check error: {type(e).__name__}: {e}")
-        await update.message.reply_text(
-            f"❌ Ошибка: <code>{type(e).__name__}: {e}</code>",
-            parse_mode="HTML",
-            reply_markup=get_menu_keyboard(user_id)
-        )
-
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     user_id = update.effective_user.id
@@ -1679,7 +1512,6 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    app.add_handler(MessageHandler(filters.VOICE, handle_voice))
 
     t = threading.Thread(target=_reminder_loop, args=(TELEGRAM_TOKEN,), daemon=True)
     t.start()
