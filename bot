@@ -32,6 +32,7 @@ def _ensure_package(package: str):
         subprocess.check_call([sys.executable, "-m", "pip", "install", package, "-q"])
 
 _ensure_package("groq")
+_ensure_package("gtts")
 
 from telegram import (
     Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
@@ -40,6 +41,8 @@ from telegram.ext import (
     Application, CommandHandler, MessageHandler, CallbackQueryHandler,
     ContextTypes, filters
 )
+from gtts import gTTS
+import tempfile
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -114,9 +117,36 @@ def call_claude(system: str, user_text: str, max_tokens: int = 600) -> str:
         data = json.loads(resp.read().decode("utf-8"))
     return data["content"][0]["text"]
 
-# ─── TTS для произношения (Google Translate) ─────────────────────────────────
+# ─── TTS для произношения (Google Translate через gTTS) ─────────────────────
 def get_hebrew_tts(text: str) -> bytes:
-    """Генерирует аудио (ogg) через Google Translate TTS"""
+    """
+    Генерирует аудио (mp3) через gTTS библиотеку
+    """
+    try:
+        # Создаём временный файл
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp_file:
+            tmp_path = tmp_file.name
+        
+        # Генерируем речь через gTTS
+        tts = gTTS(text=text, lang='he', slow=False)
+        tts.save(tmp_path)
+        
+        # Читаем файл в bytes
+        with open(tmp_path, 'rb') as f:
+            audio_bytes = f.read()
+        
+        # Удаляем временный файл
+        os.unlink(tmp_path)
+        
+        return audio_bytes
+        
+    except Exception as e:
+        logger.error(f"gTTS error: {e}")
+        # Пробуем альтернативный метод через Google Translate TTS
+        return get_hebrew_tts_google(text)
+
+def get_hebrew_tts_google(text: str) -> bytes:
+    """Резервный метод через Google Translate TTS (urllib)"""
     encoded_text = urllib.parse.quote(text)
     url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=he&client=tw-ob&q={encoded_text}"
     
@@ -126,7 +156,7 @@ def get_hebrew_tts(text: str) -> bytes:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
     )
-    with urllib.request.urlopen(req, timeout=10) as resp:
+    with urllib.request.urlopen(req, timeout=15) as resp:
         return resp.read()
 
 # ─── Groq Whisper STT для проверки произношения (бесплатно) ──────────────────
@@ -138,14 +168,29 @@ def transcribe_audio_whisper(audio_bytes: bytes) -> str:
     from groq import Groq
     client = Groq(api_key=GROQ_API_KEY)
 
-    transcription = client.audio.transcriptions.create(
-        file=("voice.ogg", audio_bytes, "audio/ogg"),
-        model="whisper-large-v3-turbo",
-        language="he",
-        response_format="json",
-    )
-    return (transcription.text or "").strip()
-
+    # Пробуем разные форматы
+    try:
+        transcription = client.audio.transcriptions.create(
+            file=("voice.ogg", audio_bytes, "audio/ogg"),
+            model="whisper-large-v3-turbo",
+            language="he",
+            response_format="json",
+        )
+        return (transcription.text or "").strip()
+    except Exception as e:
+        logger.error(f"Whisper error with ogg: {e}")
+        # Пробуем как mp3
+        try:
+            transcription = client.audio.transcriptions.create(
+                file=("voice.mp3", audio_bytes, "audio/mp3"),
+                model="whisper-large-v3-turbo",
+                language="he",
+                response_format="json",
+            )
+            return (transcription.text or "").strip()
+        except Exception as e2:
+            logger.error(f"Whisper error with mp3: {e2}")
+            raise
 
 def evaluate_pronunciation(transcribed: str, correct_he: str, correct_translit: str, correct_ru: str) -> str:
     """Оценивает произношение через Claude"""
@@ -442,7 +487,6 @@ VERBS_L2_V2 = VERBS_L2_V1 + [
 
 # Слова уровня 2 (версия 1: 500 слов, не включая первые 100)
 WORDS_L2_V1 = [
-    # Первые 100 слов уровня 2 (дополнительные к первым 100)
     {"he": "שולחן", "translit": "Шульхан", "ru": "Стол"},
     {"he": "כיסא", "translit": "Кисэ", "ru": "Стул"},
     {"he": "ספר", "translit": "Сефер", "ru": "Книга"},
@@ -626,29 +670,13 @@ def get_lessons(version: int, level: int) -> dict:
             },
             "words_l2": {
                 "title": "📖 Слова уровня 2",
-                "phrases": WORDS_L2_V1 if version == 1 else []
+                "phrases": WORDS_L2_V1 if version == 1 else WORDS_L2_V1 + []
             },
             "numbers_l2": {
                 "title": "🔢 Числа уровня 2",
                 "phrases": NUMBERS_L2_V1 if version == 1 else NUMBERS_L2_V2
             }
         }
-        # Для версии 2 добавляем больше слов
-        if version == 2:
-            # Генерируем дополнительные слова для уровня 2 версии 2
-            # (в реальности здесь должны быть 1000 слов, но для примера добавляем)
-            lessons["words_l2"]["phrases"] = WORDS_L2_V1 + [
-                {"he": "מחשבון", "translit": "Махшевон", "ru": "Калькулятор"},
-                {"he": "מצלמה", "translit": "Мацлема", "ru": "Камера"},
-                {"he": "מקלדת", "translit": "Макледет", "ru": "Клавиатура"},
-                {"he": "עכבר", "translit": "Ахбар", "ru": "Мышь (комп.)"},
-                {"he": "צג", "translit": "Цаг", "ru": "Монитор"},
-                {"he": "מדפסת", "translit": "Мадпесет", "ru": "Принтер"},
-                {"he": "סורק", "translit": "Сорек", "ru": "Сканер"},
-                {"he": "רשת", "translit": "Решет", "ru": "Сеть"},
-                {"he": "אינטרנט", "translit": "Интернет", "ru": "Интернет"},
-                {"he": "אתר", "translit": "Атар", "ru": "Сайт"},
-            ]
         return lessons
     return {}
 
@@ -682,7 +710,7 @@ def get_quiz_pool(version: int, level: int, quiz_type: str) -> list:
         if level == 1:
             return LESSONS_L1["words_l1"]["phrases"]
         else:
-            return WORDS_L2_V1 if version == 1 else WORDS_L2_V1 + []  # Для версии 2 — больше слов
+            return WORDS_L2_V1 if version == 1 else WORDS_L2_V1 + []
     elif quiz_type == "numbers":
         if level == 1:
             return LESSONS_L1["numbers"]["phrases"]
@@ -980,21 +1008,22 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer("🔊 Генерирую произношение...", show_alert=False)
         
         try:
+            # Используем улучшенный TTS
             audio_bytes = get_hebrew_tts(he_text)
-            caption = f"🇮🇱 {he_text}\n👄 {phrase['translit']}\n🇷🇺 {phrase['ru']}"
-            if "example" in phrase and phrase["example"]:
-                caption += f"\n📝 {phrase['example']}"
+            
+            # Отправляем как голосовое сообщение
             await query.message.reply_voice(
                 voice=io.BytesIO(audio_bytes),
-                caption=caption,
+                caption=f"🇮🇱 {he_text}\n👄 {phrase['translit']}\n🇷🇺 {phrase['ru']}",
                 parse_mode="Markdown"
             )
         except Exception as e:
             logger.error(f"TTS error: {e}")
             await query.message.reply_text(
-                "❌ Не удалось загрузить аудио.\n\n"
+                f"❌ Не удалось загрузить аудио.\n\n"
                 f"👄 *Читается:* {phrase['translit']}\n"
-                f"Повторите вслух несколько раз!",
+                f"Повторите вслух несколько раз!\n\n"
+                f"💡 *Совет:* Попробуйте произнести слово по слогам.",
                 parse_mode="Markdown"
             )
 
