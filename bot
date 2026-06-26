@@ -683,7 +683,7 @@ def get_lessons(version: int, level: int) -> dict:
 def get_all_lessons(version: int, level: int) -> dict:
     """Возвращает все уроки для заданной версии и уровня"""
     if level == 1:
-        return get_lessons(version, 1)
+        return LESSONS_L1.copy()
     else:
         return get_lessons(version, 2)
 
@@ -696,24 +696,23 @@ def get_lesson_by_key(version: int, level: int, lesson_key: str) -> dict:
     
     # Для уровня 2 пробуем найти в динамических уроках
     if level == 2:
-        l2_lessons = {
-            "verbs_l2": {
+        if lesson_key == "verbs_l2":
+            return {
                 "title": "🔥 Глаголы уровня 2",
                 "phrases": VERBS_L2_V1 if version == 1 else VERBS_L2_V2
-            },
-            "words_l2": {
+            }
+        elif lesson_key == "words_l2":
+            return {
                 "title": "📖 Слова уровня 2",
                 "phrases": WORDS_L2_V1 if version == 1 else WORDS_L2_V1 + []
-            },
-            "numbers_l2": {
+            }
+        elif lesson_key == "numbers_l2":
+            return {
                 "title": "🔢 Числа уровня 2",
                 "phrases": NUMBERS_L2_V1 if version == 1 else NUMBERS_L2_V2
             }
-        }
-        if lesson_key in l2_lessons:
-            return l2_lessons[lesson_key]
     
-    # Проверяем уровень 1
+    # Проверяем уровень 1 (для обратной совместимости)
     if lesson_key in LESSONS_L1:
         return LESSONS_L1[lesson_key]
     
@@ -724,9 +723,15 @@ def get_phrase_by_key(version: int, level: int, lesson_key: str, phrase_idx: int
     """Возвращает фразу по ключу урока и индексу"""
     lesson = get_lesson_by_key(version, level, lesson_key)
     if not lesson:
+        logger.error(f"Урок не найден: {lesson_key}")
         return None
     try:
-        return lesson["phrases"][phrase_idx]
+        phrases = lesson.get("phrases", [])
+        if phrase_idx < len(phrases):
+            return phrases[phrase_idx]
+        else:
+            logger.error(f"Индекс {phrase_idx} вне диапазона (всего {len(phrases)})")
+            return None
     except (IndexError, KeyError) as e:
         logger.error(f"Ошибка получения фразы: {e}")
         return None
@@ -1025,30 +1030,42 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_phrase(query, lesson_key, 0, version, level)
 
     elif data.startswith("phrase_"):
-        _, lesson_key, idx = data.split("_", 2)
-        await show_phrase(query, lesson_key, int(idx), version, level)
-
-    elif data.startswith("audio_"):
-        parts = data.split("_", 2)  # audio_lesson_key_idx
+        # Парсим: phrase_lesson_key_idx
+        parts = data.split("_")
         if len(parts) < 3:
             await query.answer("❌ Ошибка: неверный формат")
             return
-        _, lesson_key, idx_str = parts
+        lesson_key = "_".join(parts[1:-1])
+        idx_str = parts[-1]
+        try:
+            phrase_idx = int(idx_str)
+        except ValueError:
+            await query.answer("❌ Ошибка: неверный индекс")
+            return
+        await show_phrase(query, lesson_key, phrase_idx, version, level)
+
+    elif data.startswith("audio_"):
+        # Парсим: audio_lesson_key_idx
+        parts = data.split("_")
+        if len(parts) < 3:
+            await query.answer("❌ Ошибка: неверный формат")
+            return
+        
+        # Склеиваем части для lesson_key (между audio_ и последним _)
+        lesson_key = "_".join(parts[1:-1])
+        idx_str = parts[-1]
+        
         try:
             phrase_idx = int(idx_str)
         except ValueError:
             await query.answer("❌ Ошибка: неверный индекс")
             return
         
-        # Получаем версию и уровень из данных пользователя
-        user = get_user(user_id)
-        version = user.get("version", 1)
-        level = user.get("level", 1)
-        
         # Получаем фразу
         phrase = get_phrase_by_key(version, level, lesson_key, phrase_idx)
         if not phrase:
-            await query.answer("❌ Фраза не найдена")
+            await query.answer(f"❌ Фраза не найдена")
+            logger.error(f"Фраза не найдена: lesson_key={lesson_key}, idx={phrase_idx}, level={level}, version={version}")
             return
         
         he_text = phrase["he"]
@@ -1080,18 +1097,30 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     elif data.startswith("learned_"):
-        _, lesson_key, idx = data.split("_", 2)
-        key = f"{lesson_key}_{idx}"
+        # Парсим: learned_lesson_key_idx
+        parts = data.split("_")
+        if len(parts) < 3:
+            await query.answer("❌ Ошибка: неверный формат")
+            return
+        lesson_key = "_".join(parts[1:-1])
+        idx_str = parts[-1]
+        try:
+            phrase_idx = int(idx_str)
+        except ValueError:
+            await query.answer("❌ Ошибка: неверный индекс")
+            return
+        
+        key = f"{lesson_key}_{phrase_idx}"
         user_data = get_user(user_id)
         learned = user_data.get("learned", [])
         total_phrases = user_data.get("total_phrases", 0)
         
         lesson = get_lesson_by_key(version, level, lesson_key)
         if not lesson:
-            await query.edit_message_text("❌ Урок не найден.")
+            await query.answer("❌ Урок не найден")
             return
         total = len(lesson["phrases"])
-        next_idx = int(idx) + 1
+        next_idx = phrase_idx + 1
         
         if key not in learned:
             learned.append(key)
@@ -1118,15 +1147,27 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await show_phrase(query, lesson_key, next_idx, version, level)
 
     elif data.startswith("checkpron_"):
-        _, lesson_key, idx = data.split("_", 2)
+        # Парсим: checkpron_lesson_key_idx
+        parts = data.split("_")
+        if len(parts) < 3:
+            await query.answer("❌ Ошибка: неверный формат")
+            return
+        lesson_key = "_".join(parts[1:-1])
+        idx_str = parts[-1]
+        try:
+            phrase_idx = int(idx_str)
+        except ValueError:
+            await query.answer("❌ Ошибка: неверный индекс")
+            return
+        
         lesson = get_lesson_by_key(version, level, lesson_key)
         if not lesson:
-            await query.edit_message_text("❌ Урок не найден.")
+            await query.answer("❌ Урок не найден")
             return
-        phrase = lesson["phrases"][int(idx)]
+        phrase = lesson["phrases"][phrase_idx]
         context.user_data["pron_check"] = {
             "lesson_key": lesson_key,
-            "phrase_idx": int(idx),
+            "phrase_idx": phrase_idx,
             "he": phrase["he"],
             "translit": phrase["translit"],
             "ru": phrase["ru"],
