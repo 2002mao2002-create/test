@@ -322,7 +322,7 @@ LESSONS = {
 LESSONS_V2_VERBS = {
     "title": "🔥 Глаголы: 3 времени",
     "phrases": [
-        {"he": "הָיִיתִי / אֶהְיֶה / אֲנִי הָיִיתִי", "translit": "Хайити / Эхье / Хайити", "translit_en": "Hayiti / Ehye / Hayiti", "ru": "Быть — я: был(а) / буду / есть"},
+        {"he": "הָיִיתִי / אֶהְיֶה / אֲנִי הָיִיתִי", "translit": "Хайити / Эхье / Хайити", "translit_en": "Hayiti / Ehye / Hayiti", "ru": "Быть — я: был(а) / буду / есмь"},
         {"he": "הוּא הָיָה / יִהְיֶה / הוּא", "translit": "Ху hая / Йихье / Ху", "translit_en": "Hu haya / Yihye / Hu", "ru": "Быть — он: был / будет / есть"},
         {"he": "עָשִׂיתִי / אֶעֱשֶׂה / עוֹשֶׂה", "translit": "Асити / Ээсэ / Осэ", "translit_en": "Asiti / E'ese / Ose", "ru": "Делать — я: сделал(а) / сделаю / делаю"},
         {"he": "הוּא עָשָׂה / יַעֲשֶׂה / עוֹשֶׂה", "translit": "Ху аса / Яасэ / Осэ", "translit_en": "Hu asa / Ya'ase / Ose", "ru": "Делать — он: сделал / сделает / делает"},
@@ -344,6 +344,60 @@ LESSONS_V2_VERBS = {
         {"he": "הוּא רָצָה / יִרְצֶה / רוֹצֶה", "translit": "Ху раца / Йирцэ / Роцэ", "translit_en": "Hu ratza / Yirtze / Rotze", "ru": "Хотеть — он: хотел / захочет / хочет"},
     ]
 }
+
+# ─── Числа до 1000 для версии 2 ───────────────────────────────────────────────
+NUMBERS_V2 = [
+    {"he": "אֶחָד", "translit": "Эхад", "translit_en": "Echad", "ru": "1 — Один"},
+    {"he": "שְׁתַּיִם", "translit": "Штаим", "translit_en": "Shtayim", "ru": "2 — Два"},
+    {"he": "שָׁלוֹשׁ", "translit": "Шалош", "translit_en": "Shalosh", "ru": "3 — Три"},
+    {"he": "אַרְבַּע", "translit": "Арба", "translit_en": "Arba", "ru": "4 — Четыре"},
+    {"he": "חָמֵשׁ", "translit": "Хамеш", "translit_en": "Hamesh", "ru": "5 — Пять"},
+    {"he": "שֵׁשׁ", "translit": "Шеш", "translit_en": "Shesh", "ru": "6 — Шесть"},
+    {"he": "שֶׁבַע", "translit": "Шева", "translit_en": "Sheva", "ru": "7 — Семь"},
+    {"he": "שְׁמוֹנֶה", "translit": "Шмоне", "translit_en": "Shmone", "ru": "8 — Восемь"},
+    {"he": "תֵּשַׁע", "translit": "Теша", "translit_en": "Tesha", "ru": "9 — Девять"},
+    {"he": "עֶשֶׂר", "translit": "Эсэр", "translit_en": "Eser", "ru": "10 — Десять"},
+    {"he": "אַחַד עָשָׂר", "translit": "Ахад асар", "translit_en": "Achad asar", "ru": "11 — Одиннадцать"},
+    {"he": "שְׁנֵים עָשָׂר", "translit": "Шнейм асар", "translit_en": "Shneym asar", "ru": "12 — Двенадцать"},
+    {"he": "שְׁלוֹשָׁה עָשָׂר", "translit": "Шлоша асар", "translit_en": "Shloshа asar", "ru": "13 — Тринадцать"},
+    {"he": "אַרְבָּעָה עָשָׂר", "translit": "Арбаа асар", "translit_en": "Arba'a asar", "ru": "14 — Четырнадцать"},
+    {"he": "חֲמִשָּׁה עָשָׂר", "translit": "Хамиша асар", "translit_en": "Chamisha asar", "ru": "15 — Пятнадцать"},
+    {"he": "שִׁשָּׁה עָשָׂר", "translit": "Шиша асар", "translit_en": "Shisha asar", "ru": "16 — Шестнадцать"},
+    {"he": "שִׁבְעָה עָשָׂר", "translit": "Шивъа асар", "translit_en": "Shiv'a asar", "ru": "17 — Семнадцать"},
+    {"he": "שְׁמוֹנָה עָשָׂר", "translit": "Шмона асар", "translit_en": "Shmona asar", "ru": "18 — Восемнадцать"},
+    {"he": "תִּשְׁעָה עָשָׂר", "translit": "Тишъа асар", "translit_en": "Tish'a asar", "ru": "19 — Девятнадцать"},
+    {"he": "עֶשְׂרִים", "translit": "Эсрим", "translit_en": "Esrim", "ru": "20 — Двадцать"},
+    {"he": "שְׁלוֹשִׁים", "translit": "Шлошим", "translit_en": "Shloshim", "ru": "30 — Тридцать"},
+    {"he": "אַרְבָּעִים", "translit": "Арбаим", "translit_en": "Arba'im", "ru": "40 — Сорок"},
+    {"he": "חֲמִשִּׁים", "translit": "Хамишим", "translit_en": "Chamishim", "ru": "50 — Пятьдесят"},
+    {"he": "שִׁשִּׁים", "translit": "Шишим", "translit_en": "Shishim", "ru": "60 — Шестьдесят"},
+    {"he": "שִׁבְעִים", "translit": "Шивъим", "translit_en": "Shiv'im", "ru": "70 — Семьдесят"},
+    {"he": "שְׁמוֹנִים", "translit": "Шмоним", "translit_en": "Shmonim", "ru": "80 — Восемьдесят"},
+    {"he": "תִּשְׁעִים", "translit": "Тишъим", "translit_en": "Tish'im", "ru": "90 — Девяносто"},
+    {"he": "מֵאָה", "translit": "Меа", "translit_en": "Mea", "ru": "100 — Сто"},
+    {"he": "מָאתַיִם", "translit": "Матаим", "translit_en": "Matayim", "ru": "200 — Двести"},
+    {"he": "שְׁלוֹשׁ מֵאוֹת", "translit": "Шлош меот", "translit_en": "Shlosh meot", "ru": "300 — Триста"},
+    {"he": "אַרְבַּע מֵאוֹת", "translit": "Арба меот", "translit_en": "Arba meot", "ru": "400 — Четыреста"},
+    {"he": "חֲמֵשׁ מֵאוֹת", "translit": "Хамеш меот", "translit_en": "Hamesh meot", "ru": "500 — Пятьсот"},
+    {"he": "שֵׁשׁ מֵאוֹת", "translit": "Шеш меот", "translit_en": "Shesh meot", "ru": "600 — Шестьсот"},
+    {"he": "שְׁבַע מֵאוֹת", "translit": "Шва меот", "translit_en": "Shva meot", "ru": "700 — Семьсот"},
+    {"he": "שְׁמוֹנֶה מֵאוֹת", "translit": "Шмоне меот", "translit_en": "Shmone meot", "ru": "800 — Восемьсот"},
+    {"he": "תְּשַׁע מֵאוֹת", "translit": "Тша меот", "translit_en": "Tsha meot", "ru": "900 — Девятьсот"},
+    {"he": "אֶלֶף", "translit": "Элеф", "translit_en": "Elef", "ru": "1000 — Тысяча"},
+]
+
+# ─── Пулы для тестов ─────────────────────────────────────────────────────────
+def get_quiz_pool_verbs(version: int):
+    """Пул для теста глаголов"""
+    src = LESSONS_V2_VERBS["phrases"] if version == 2 else LESSONS["food"]["phrases"]
+    return src
+
+def get_quiz_pool_words(version: int):
+    """Пул для теста слов (приветствия + 100 слов)"""
+    pool = []
+    for key in ("greetings", "phrases"):
+        pool.extend(LESSONS[key]["phrases"])
+    return pool
 
 DAILY_TIPS = [
     "💡 Иврит читается справа налево! Это одна из первых вещей, которую нужно запомнить.",
@@ -408,10 +462,22 @@ def update_streak(user_id: int):
 # ─── Keyboards ────────────────────────────────────────────────────────────────
 def main_menu_keyboard():
     return ReplyKeyboardMarkup([
-        ["📚 Уроки", "🎯 Тест"],
-        ["📊 Мой прогресс", "💡 Совет дня"],
+        ["📚 Уроки", "📊 Мой прогресс"],
+        ["🎯 Тест глаголы", "🎯 Тест слова"],
+        ["💡 Совет дня", "⚙️ Настройки"],
+    ], resize_keyboard=True)
+
+def main_menu_keyboard_v2():
+    return ReplyKeyboardMarkup([
+        ["📚 Уроки", "📊 Мой прогресс"],
+        ["🎯 Тест глаголы", "🎯 Тест слова"],
+        ["🔢 Тест числа", "💡 Совет дня"],
         ["⚙️ Настройки"],
     ], resize_keyboard=True)
+
+def get_menu_keyboard(user_id: int):
+    version = get_user(user_id).get("version", 1)
+    return main_menu_keyboard_v2() if version == 2 else main_menu_keyboard()
 
 def lessons_keyboard(version: int = 1):
     buttons = []
@@ -531,7 +597,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Иврит читается *справа налево* — начнём! 🇮🇱",
             parse_mode="Markdown",
         )
-        await query.message.reply_text("Выберите раздел:", reply_markup=main_menu_keyboard())
+        await query.message.reply_text("Выберите раздел:", reply_markup=get_menu_keyboard(user_id))
 
     elif data.startswith("lesson_"):
         lesson_key = data[7:]
@@ -620,6 +686,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "go_lessons":
         await query.edit_message_text("📚 Выберите тему:", reply_markup=lessons_keyboard())
 
+    elif data.startswith("quiz_type_"):
+        quiz_type = data[len("quiz_type_"):]
+        await send_quiz_question(query.message, user_id, context, quiz_type)
+
     elif data.startswith("quiz_"):
         await handle_quiz_answer(query, user_id, data, context)
 
@@ -654,37 +724,58 @@ async def daily_tip(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(tip)
 
 async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await send_quiz_question(update.message, update.effective_user.id, context)
+    """Показывает меню выбора теста"""
+    user_id = update.effective_user.id
+    version = get_user(user_id).get("version", 1)
+    buttons = [
+        [InlineKeyboardButton("🎯 Тест глаголы", callback_data="quiz_type_verbs")],
+        [InlineKeyboardButton("🎯 Тест слова", callback_data="quiz_type_words")],
+    ]
+    if version == 2:
+        buttons.append([InlineKeyboardButton("🔢 Тест числа", callback_data="quiz_type_numbers")])
+    await update.message.reply_text(
+        "🎯 *Выберите тест:*",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
 
-async def send_quiz_question(message, user_id: int, context):
-    all_phrases = []
-    for key, lesson in LESSONS.items():
-        for i, phrase in enumerate(lesson["phrases"]):
-            all_phrases.append((key, i, phrase))
+async def send_quiz_question(message, user_id: int, context, quiz_type: str = "words"):
+    version = get_user(user_id).get("version", 1)
 
-    if len(all_phrases) < 4:
+    if quiz_type == "verbs":
+        pool = get_quiz_pool_verbs(version)
+        title = "🔥 Тест: глаголы"
+    elif quiz_type == "numbers":
+        pool = NUMBERS_V2
+        title = "🔢 Тест: числа"
+    else:
+        pool = get_quiz_pool_words(version)
+        title = "📖 Тест: слова"
+
+    if len(pool) < 4:
         await message.reply_text("Недостаточно фраз для теста.")
         return
 
-    correct_key, correct_idx, correct = random.choice(all_phrases)
-    wrong_options = random.sample(
-        [p for k, i, p in all_phrases if p["he"] != correct["he"]], 3
-    )
+    correct = random.choice(pool)
+    wrong_options = random.sample([p for p in pool if p["he"] != correct["he"]], 3)
     all_options = [correct] + wrong_options
     random.shuffle(all_options)
     correct_pos = next(i for i, p in enumerate(all_options) if p["he"] == correct["he"])
 
     context.user_data["quiz_correct"] = correct_pos
     context.user_data["quiz_phrase"] = correct
+    context.user_data["quiz_type"] = quiz_type
 
-    buttons = []
-    for i, opt in enumerate(all_options):
-        buttons.append([InlineKeyboardButton(opt["ru"], callback_data=f"quiz_{i}")])
+    translit_show = correct["translit"]
+    if version == 2 and "translit_en" in correct:
+        translit_show += f" / {correct['translit_en']}"
+
+    buttons = [[InlineKeyboardButton(opt["ru"], callback_data=f"quiz_{i}")] for i, opt in enumerate(all_options)]
 
     await message.reply_text(
-        f"🎯 *Тест*\n\nКак переводится:\n\n"
+        f"{title}\n\nКак переводится:\n\n"
         f"🇮🇱 _{correct['he']}_\n"
-        f"🔤 ({correct['translit']})\n\n"
+        f"🔤 ({translit_show})\n\n"
         f"Выберите правильный перевод:",
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(buttons)
@@ -694,11 +785,13 @@ async def handle_quiz_answer(query, user_id: int, data: str, context):
     chosen = int(data.split("_")[1])
     correct_pos = context.user_data.get("quiz_correct")
     correct_phrase = context.user_data.get("quiz_phrase", {})
+    quiz_type = context.user_data.get("quiz_type", "words")
 
     if correct_pos is None:
-        await query.edit_message_text("Начните тест заново — нажмите 🎯 Тест")
+        await query.edit_message_text("Начните тест заново — нажмите кнопку теста")
         return
 
+    version = get_user(user_id).get("version", 1)
     user = get_user(user_id)
     quiz_total = user.get("quiz_total", 0) + 1
     quiz_score = user.get("quiz_score", 0)
@@ -709,9 +802,13 @@ async def handle_quiz_answer(query, user_id: int, data: str, context):
     else:
         result = "❌ *Неправильно.*\n\n"
 
+    translit_show = correct_phrase.get("translit", "")
+    if version == 2 and "translit_en" in correct_phrase:
+        translit_show += f" / {correct_phrase['translit_en']}"
+
     result += (
         f"🇮🇱 {correct_phrase.get('he', '')}\n"
-        f"🔤 {correct_phrase.get('translit', '')}\n"
+        f"🔤 {translit_show}\n"
         f"🇷🇺 {correct_phrase.get('ru', '')}"
     )
 
@@ -720,7 +817,7 @@ async def handle_quiz_answer(query, user_id: int, data: str, context):
     context.user_data.pop("quiz_phrase", None)
 
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎯 Ещё вопрос", callback_data="next_quiz")],
+        [InlineKeyboardButton("🎯 Ещё вопрос", callback_data=f"next_quiz_{quiz_type}")],
         [InlineKeyboardButton("📊 Мой счёт", callback_data="show_score")],
     ])
     await query.edit_message_text(result, parse_mode="Markdown", reply_markup=buttons)
@@ -728,9 +825,11 @@ async def handle_quiz_answer(query, user_id: int, data: str, context):
 async def next_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    if query.data == "next_quiz":
-        await send_quiz_question(query.message, query.from_user.id, context)
-    elif query.data == "show_score":
+    data = query.data
+    if data.startswith("next_quiz_"):
+        quiz_type = data[len("next_quiz_"):]
+        await send_quiz_question(query.message, query.from_user.id, context, quiz_type)
+    elif data == "show_score":
         user = get_user(query.from_user.id)
         score = user.get("quiz_score", 0)
         total = user.get("quiz_total", 0)
@@ -804,10 +903,11 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         logger.error(f"Voice check error: {type(e).__name__}: {e}")
+        user_id = update.effective_user.id
         await update.message.reply_text(
             f"❌ Ошибка: <code>{type(e).__name__}: {e}</code>",
             parse_mode="HTML",
-            reply_markup=main_menu_keyboard()
+            reply_markup=get_menu_keyboard(user_id)
         )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -817,6 +917,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text == "📚 Уроки":
         await lessons_menu(update, context)
+    elif text == "🎯 Тест глаголы":
+        await send_quiz_question(update.message, user_id, context, "verbs")
+    elif text == "🎯 Тест слова":
+        await send_quiz_question(update.message, user_id, context, "words")
+    elif text == "🔢 Тест числа":
+        await send_quiz_question(update.message, user_id, context, "numbers")
     elif text == "🎯 Тест":
         await quiz(update, context)
     elif text == "📊 Мой прогресс":
@@ -828,7 +934,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(
             "Выберите раздел в меню ниже 👇",
-            reply_markup=main_menu_keyboard()
+            reply_markup=get_menu_keyboard(user_id)
         )
 
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -916,7 +1022,7 @@ def main():
     app.add_handler(CommandHandler("quiz", quiz))
     app.add_handler(CommandHandler("progress", progress))
 
-    app.add_handler(CallbackQueryHandler(next_quiz_callback, pattern=r"^(next_quiz|show_score)$"))
+    app.add_handler(CallbackQueryHandler(next_quiz_callback, pattern=r"^(next_quiz_|show_score)"))
     app.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^(toggle_reminders|reset_progress)$"))
     app.add_handler(CallbackQueryHandler(callback_handler))
 
