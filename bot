@@ -318,6 +318,33 @@ LESSONS = {
     },
 }
 
+# ─── Уроки версии 2: глаголы в трёх временах ─────────────────────────────────
+LESSONS_V2_VERBS = {
+    "title": "🔥 Глаголы: 3 времени",
+    "phrases": [
+        {"he": "הָיִיתִי / אֶהְיֶה / אֲנִי הָיִיתִי", "translit": "Хайити / Эхье / Хайити", "translit_en": "Hayiti / Ehye / Hayiti", "ru": "Быть — я: был(а) / буду / есмь"},
+        {"he": "הוּא הָיָה / יִהְיֶה / הוּא", "translit": "Ху hая / Йихье / Ху", "translit_en": "Hu haya / Yihye / Hu", "ru": "Быть — он: был / будет / есть"},
+        {"he": "עָשִׂיתִי / אֶעֱשֶׂה / עוֹשֶׂה", "translit": "Асити / Ээсэ / Осэ", "translit_en": "Asiti / E'ese / Ose", "ru": "Делать — я: сделал(а) / сделаю / делаю"},
+        {"he": "הוּא עָשָׂה / יַעֲשֶׂה / עוֹשֶׂה", "translit": "Ху аса / Яасэ / Осэ", "translit_en": "Hu asa / Ya'ase / Ose", "ru": "Делать — он: сделал / сделает / делает"},
+        {"he": "אָמַרְתִּי / אֹמַר / אוֹמֵר", "translit": "Амарти / Омар / Омер", "translit_en": "Amarti / Omar / Omer", "ru": "Говорить — я: сказал(а) / скажу / говорю"},
+        {"he": "הוּא אָמַר / יֹאמַר / אוֹמֵר", "translit": "Ху амар / Йомар / Омер", "translit_en": "Hu amar / Yomar / Omer", "ru": "Говорить — он: сказал / скажет / говорит"},
+        {"he": "הָלַכְתִּי / אֵלֵךְ / הוֹלֵךְ", "translit": "hалахти / Элех / hолех", "translit_en": "Halachti / Elech / Holech", "ru": "Идти — я: пошёл(ла) / пойду / иду"},
+        {"he": "הוּא הָלַךְ / יֵלֵךְ / הוֹלֵךְ", "translit": "Ху hалах / Йелех / hолех", "translit_en": "Hu halach / Yelech / Holech", "ru": "Идти — он: пошёл / пойдёт / идёт"},
+        {"he": "יָדַעְתִּי / אֵדַע / יוֹדֵעַ", "translit": "Ядати / Эда / Йодеа", "translit_en": "Yadati / Eda / Yodea", "ru": "Знать — я: знал(а) / узнаю / знаю"},
+        {"he": "הוּא יָדַע / יֵדַע / יוֹדֵעַ", "translit": "Ху яда / Йеда / Йодеа", "translit_en": "Hu yada / Yeda / Yodea", "ru": "Знать — он: знал / узнает / знает"},
+        {"he": "רָאִיתִי / אֶרְאֶה / רוֹאֶה", "translit": "Раити / Эрэ / Роэ", "translit_en": "Ra'iti / Er'e / Ro'e", "ru": "Видеть — я: видел(а) / увижу / вижу"},
+        {"he": "הוּא רָאָה / יִרְאֶה / רוֹאֶה", "translit": "Ху раа / Йирэ / Роэ", "translit_en": "Hu ra'a / Yir'e / Ro'e", "ru": "Видеть — он: видел / увидит / видит"},
+        {"he": "בָּאתִי / אָבוֹא / בָּא", "translit": "Бати / Аво / Ба", "translit_en": "Bati / Avo / Ba", "ru": "Прийти — я: пришёл(ла) / приду / прихожу"},
+        {"he": "הוּא בָּא / יָבוֹא / בָּא", "translit": "Ху ба / Яво / Ба", "translit_en": "Hu ba / Yavo / Ba", "ru": "Прийти — он: пришёл / придёт / приходит"},
+        {"he": "נָתַתִּי / אֶתֵּן / נוֹתֵן", "translit": "Натати / Этен / Нотен", "translit_en": "Natati / Eten / Noten", "ru": "Давать — я: дал(а) / дам / даю"},
+        {"he": "הוּא נָתַן / יִתֵּן / נוֹתֵן", "translit": "Ху натан / Йитен / Нотен", "translit_en": "Hu natan / Yiten / Noten", "ru": "Давать — он: дал / даст / даёт"},
+        {"he": "דִּבַּרְתִּי / אֲדַבֵּר / מְדַבֵּר", "translit": "Дибарти / Адабер / Медабер", "translit_en": "Dibarti / Adaber / Medaber", "ru": "Разговаривать — я: говорил(а) / буду говорить / говорю"},
+        {"he": "הוּא דִּיבֵּר / יְדַבֵּר / מְדַבֵּר", "translit": "Ху дибер / Йедабер / Медабер", "translit_en": "Hu diber / Yedaber / Medaber", "ru": "Разговаривать — он: говорил / будет говорить / говорит"},
+        {"he": "רָצִיתִי / אֶרְצֶה / רוֹצֶה", "translit": "Рацити / Эрцэ / Роцэ", "translit_en": "Ratziti / Ertze / Rotze", "ru": "Хотеть — я: хотел(а) / захочу / хочу"},
+        {"he": "הוּא רָצָה / יִרְצֶה / רוֹצֶה", "translit": "Ху раца / Йирцэ / Роцэ", "translit_en": "Hu ratza / Yirtze / Rotze", "ru": "Хотеть — он: хотел / захочет / хочет"},
+    ]
+}
+
 DAILY_TIPS = [
     "💡 Иврит читается справа налево! Это одна из первых вещей, которую нужно запомнить.",
     "💡 В иврите нет заглавных букв — все буквы одного размера.",
@@ -386,10 +413,14 @@ def main_menu_keyboard():
         ["⚙️ Настройки"],
     ], resize_keyboard=True)
 
-def lessons_keyboard():
+def lessons_keyboard(version: int = 1):
     buttons = []
     for key, lesson in LESSONS.items():
-        buttons.append([InlineKeyboardButton(lesson["title"], callback_data=f"lesson_{key}")])
+        title = lesson["title"]
+        # В версии 2 для глаголов показываем расширенный урок
+        if version == 2 and key == "food":
+            title = LESSONS_V2_VERBS["title"]
+        buttons.append([InlineKeyboardButton(title, callback_data=f"lesson_{key}")])
     return InlineKeyboardMarkup(buttons)
 
 def phrase_keyboard(lesson_key: str, phrase_idx: int, total: int):
@@ -421,37 +452,54 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     update_streak(user.id)
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🇷🇺 Версия 1 — транслитерация на русском", callback_data="set_version_1")],
-        [InlineKeyboardButton("🇬🇧 Версия 2 — транслитерация на английском", callback_data="set_version_2")],
+        [
+            InlineKeyboardButton("Версия 1", callback_data="set_version_1"),
+            InlineKeyboardButton("Версия 2", callback_data="set_version_2"),
+        ],
     ])
     await update.message.reply_text(
         f"שָׁלוֹם, {user.first_name}! 👋\n\n"
         "Добро пожаловать в бот для изучения иврита!\n\n"
-        "Выберите версию транслитерации:",
+        "Выберите версию:\n"
+        "• *Версия 1* — транслитерация на русском\n"
+        "• *Версия 2* — транслитерация на русском и английском, глаголы в трёх временах",
         parse_mode="Markdown",
         reply_markup=buttons
     )
 
 async def lessons_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    version = get_user(user_id).get("version", 1)
     await update.message.reply_text(
         "📚 *Выберите тему урока:*",
         parse_mode="Markdown",
-        reply_markup=lessons_keyboard()
+        reply_markup=lessons_keyboard(version)
     )
 
 async def show_phrase(query, lesson_key: str, phrase_idx: int, version: int = 1):
-    lesson = LESSONS[lesson_key]
+    # В версии 2 для глаголов используем расширенный урок
+    if version == 2 and lesson_key == "food":
+        lesson = LESSONS_V2_VERBS
+    else:
+        lesson = LESSONS[lesson_key]
+
     phrase = lesson["phrases"][phrase_idx]
     total = len(lesson["phrases"])
 
-    translit = phrase.get("translit_en", phrase["translit"]) if version == 2 else phrase["translit"]
-    translit_label = "🇬🇧 Транслитерация (EN):" if version == 2 else "🔤 Транслитерация:"
+    if version == 2:
+        translit_line = (
+            f"🔤 *Транслитерация:*\n"
+            f"_{phrase['translit']}_\n"
+            f"_{phrase.get('translit_en', '')}_ 🇬🇧"
+        )
+    else:
+        translit_line = f"🔤 *Транслитерация:*\n_{phrase['translit']}_"
 
     text = (
         f"{lesson['title']} — фраза {phrase_idx + 1}/{total}\n\n"
         f"🇮🇱 *Иврит:*\n"
         f"```\n{phrase['he']}\n```\n\n"
-        f"{translit_label}\n_{translit}_\n\n"
+        f"{translit_line}\n\n"
         f"🇷🇺 *По-русски:*\n{phrase['ru']}"
     )
     await query.edit_message_text(
@@ -469,9 +517,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("set_version_"):
         version = int(data.split("_")[-1])
         update_user(user_id, {"version": version})
-        label = "🇷🇺 русском" if version == 1 else "🇬🇧 английском"
+        if version == 1:
+            desc = "транслитерация на *русском*"
+        else:
+            desc = "транслитерация на *русском и английском*, глаголы в трёх временах"
         await query.edit_message_text(
-            f"✅ Выбрана версия {version} — транслитерация на {label}!\n\n"
+            f"✅ *Версия {version}* выбрана — {desc}!\n\n"
             "Здесь вы найдёте:\n"
             "📚 *Уроки* — фразы с транслитерацией\n"
             "🎯 *Тест* — проверь свои знания\n"
