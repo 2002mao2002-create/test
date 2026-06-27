@@ -67,8 +67,7 @@ TELEGRAM_TOKEN = (
     os.getenv("BOT_API_TOKEN") or ""
 ).strip()
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
-FEEDBACK_USERNAME = "@aaron_ast"   # для отображения пользователю
-FEEDBACK_CHAT_ID = 6287004156         # числовой ID для отправки сообщений
+FEEDBACK_USERNAME = "@aaron_ast"
 DATA_FILE = Path("user_data.json")
 
 logger.info(f"TELEGRAM_TOKEN: {'OK' if TELEGRAM_TOKEN else 'НЕТ'}")
@@ -1188,48 +1187,16 @@ async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(random.choice(DAILY_TIPS))
     elif text == "✉️ Пожелания":
         await update.message.reply_text(
-            f"✉️ *Пожелания и замечания*\n\n"
-            f"Напишите ваше сообщение — оно будет отправлено разработчику {FEEDBACK_USERNAME}\n\n"
-            f"_Просто напишите текст и нажмите отправить:_",
-            parse_mode="Markdown"
+            "✉️ *Пожелания и замечания*\n\n"
+            "Нажмите кнопку ниже — откроется чат с разработчиком.\n"
+            "Напишите ваше пожелание или замечание.",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("💬 Написать @aaron_ast", url="https://t.me/aaron_ast")],
+            ])
         )
-        ctx.user_data["feedback_mode"] = True
     elif text == "⚙️ Настройки":
         await show_settings(update.message, uid)
-    elif ctx.user_data.get("feedback_mode"):
-        ctx.user_data["feedback_mode"] = False
-        sender = f"@{update.effective_user.username}" if update.effective_user.username else str(uid)
-        msg_text = f"📩 Пожелание от {sender} (id: {uid}):\n\n{text}"
-        sent = False
-        # Пробуем отправить по username (работает если @aaron_ast писал боту хотя бы раз)
-        try:
-            payload = json.dumps({
-                "chat_id": FEEDBACK_CHAT_ID,
-                "text": msg_text,
-            }).encode()
-            req = urllib.request.Request(
-                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                data=payload,
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                result = json.loads(resp.read())
-                if result.get("ok"):
-                    sent = True
-        except Exception as e:
-            logger.warning(f"Feedback send failed: {e}")
-        if sent:
-            await update.message.reply_text(
-                f"✅ Спасибо! Сообщение отправлено разработчику.",
-                reply_markup=main_kb()
-            )
-        else:
-            await update.message.reply_text(
-                f"✅ Спасибо за пожелание!\n"
-                f"Напишите напрямую: {FEEDBACK_USERNAME}",
-                reply_markup=main_kb()
-            )
     else:
         await update.message.reply_text("Выберите раздел 👇", reply_markup=main_kb())
 
@@ -1504,23 +1471,28 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         ctx.user_data.pop("qz_correct", None)
         ctx.user_data.pop("qz_phrase", None)
 
-        text = (
-            f"{result}\n\n"
-            f"🇮🇱 `{correct_phrase.get('he','')}`\n"
-            f"👄 _{correct_phrase.get('tr','')}_\n"
-            f"🇷🇺 {correct_phrase.get('ru','')}"
-        )
-        if u2["variant"] == 2 and "past" in correct_phrase:
-            text += f"\n\n🕰 {correct_phrase['past']}\n🔮 {correct_phrase['future']}"
-
-        await q.edit_message_text(
-            text,
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🎯 Ещё вопрос", callback_data="qz_next")],
-                [InlineKeyboardButton("📊 Мой счёт", callback_data="qz_score")],
-            ])
-        )
+        if chosen == correct_idx:
+            # Правильно — сразу следующий вопрос
+            await q.answer("✅ Правильно!", show_alert=False)
+            await start_quiz(q.message, uid, ctx)
+        else:
+            # Неправильно — показываем правильный ответ
+            text = (
+                f"❌ *Неправильно!*\n\n"
+                f"🇮🇱 `{correct_phrase.get('he','')}`\n"
+                f"👄 _{correct_phrase.get('tr','')}_\n"
+                f"🇷🇺 {correct_phrase.get('ru','')}"
+            )
+            if u2["variant"] == 2 and "past" in correct_phrase:
+                text += f"\n\n🕰 {correct_phrase['past']}\n🔮 {correct_phrase['future']}"
+            await q.edit_message_text(
+                text,
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("➡️ Следующий вопрос", callback_data="qz_next")],
+                    [InlineKeyboardButton("📊 Мой счёт", callback_data="qz_score")],
+                ])
+            )
 
     elif d == "qz_next":
         await start_quiz(q.message, uid, ctx)
