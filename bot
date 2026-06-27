@@ -1103,7 +1103,7 @@ def phrase_kb(sec_title: str, pos: int, total_unlearned: int, orig_idx: int):
         InlineKeyboardButton("🔊 Аудио", callback_data=f"au|{sec_title}|{orig_idx}"),
         InlineKeyboardButton("✅ Выучил", callback_data=f"lrn|{sec_title}|{orig_idx}|{pos}"),
     ])
-    rows.append([InlineKeyboardButton("🎯 Тест по этой теме", callback_data=f"quiz_sec|{sec_title}")])
+    rows.append([InlineKeyboardButton("🎯 Тест по этой теме", callback_data="quiz_cur")])
     rows.append([InlineKeyboardButton("← К урокам", callback_data="back_lessons")])
     return InlineKeyboardMarkup(rows)
 
@@ -1477,6 +1477,20 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             )
 
     # Тест
+    elif d == "qz_next":
+        await next_quiz(q, uid, ctx)
+
+    elif d == "qz_score":
+        u2 = get_user(uid)
+        qs = u2.get("quiz_score", 0)
+        qt = u2.get("quiz_total", 0)
+        pct = round(qs / qt * 100) if qt else 0
+        await q.edit_message_text(
+            f"📊 *Ваш счёт*\n\n✅ {qs}/{qt} ({pct}%)\n\n"
+            f"{'🏆 Отлично!' if pct >= 80 else '💪 Продолжайте!'}",
+            parse_mode="Markdown"
+        )
+
     elif d.startswith("qz_"):
         chosen = int(d[3:])
         correct_idx = ctx.user_data.get("qz_correct")
@@ -1519,23 +1533,10 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 ])
             )
 
-    elif d.startswith("quiz_sec|"):
-        sec_title = d[9:]
+    elif d == "quiz_cur":
+        # Тест по текущему открытому разделу
+        sec_title = ctx.user_data.get("sec")
         await start_quiz(q.message, uid, ctx, sec_title=sec_title)
-
-    elif d == "qz_next":
-        await next_quiz(q, uid, ctx)
-
-    elif d == "qz_score":
-        u2 = get_user(uid)
-        qs = u2.get("quiz_score", 0)
-        qt = u2.get("quiz_total", 0)
-        pct = round(qs / qt * 100) if qt else 0
-        await q.edit_message_text(
-            f"📊 *Ваш счёт*\n\n✅ {qs}/{qt} ({pct}%)\n\n"
-            f"{'🏆 Отлично!' if pct >= 80 else '💪 Продолжайте!'}",
-            parse_mode="Markdown"
-        )
 
     # Настройки
     elif d == "toggle_rem":
