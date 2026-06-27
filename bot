@@ -514,7 +514,7 @@ V1_P3_VERBS = [
     {"he": "לחקור",    "tr": "Лахкор",     "ru": "Исследовать",      "now": "הוא חוקר (Ху хокер)"},
     {"he": "להגיד",    "tr": "Лехагид",    "ru": "Говорить/сказать", "now": "אני אומר (Ани омер)"},
     {"he": "לבדוק",    "tr": "Ливдок",     "ru": "Проверять",        "now": "הוא בודק (Ху бодек)"},
-    {"he": "לנהל",     "tr": "Лenhagen",   "ru": "Управлять",        "now": "אני מנהל (Ани менахель)"},
+    {"he": "לנהל",     "tr": "Ленахель",   "ru": "Управлять",        "now": "אני מנהל (Ани менахель)"},
     {"he": "להוביל",   "tr": "Лехоиль",    "ru": "Вести/руководить", "now": "הוא מוביל (Ху мовиль)"},
     {"he": "להשפיע",   "tr": "Лехашпиа",   "ru": "Влиять",           "now": "הוא משפיע (Ху машпиа)"},
     {"he": "לקבל",     "tr": "Лекабель",   "ru": "Получать",         "now": "אני מקבל (Ани мекабель)"},
@@ -813,7 +813,7 @@ V2_P2_VERBS = [
         "אני משנה (Ани мешане)", "שיניתי (Шиниити) — Я менял", "אשנה (Эшане) — Я изменю"),
     make_v2_verb("לפתח",   "Лефатеах", "Развивать",
         "הוא מפתח (Ху мефатеах)", "פיתחתי (Питахти) — Я развивал", "אפתח (Эфатеах) — Я разовью"),
-    make_v2_verb("לנהל",   "Лenhagen", "Управлять",
+    make_v2_verb("לנהל",   "Ленахель", "Управлять",
         "אני מנהל (Ани менахель)", "ניהלתי (Нихальти) — Я управлял", "אנהל (Анахель) — Я буду управлять"),
     make_v2_verb("להגן",   "Лехаген",  "Защищать",
         "הוא מגן (Ху меген)", "הגנתי (Эгенти) — Я защищал", "אגן (Аген) — Я защищу"),
@@ -1031,16 +1031,6 @@ def item_word(sec_title: str) -> str:
     else:
         return "слов"
 
-def item_word_acc(sec_title: str) -> str:
-    """Винительный падеж — 'слово', 'глагол', 'число'."""
-    t = sec_title.lower()
-    if "глагол" in t:
-        return "глагол"
-    elif "числ" in t:
-        return "число"
-    else:
-        return "слово"
-
 def get_unlearned(uid: int, sec_title: str, phrases: list) -> list:
     """Возвращает только не выученные элементы из списка."""
     learned = get_user(uid).get("learned", [])
@@ -1247,8 +1237,10 @@ async def start_quiz(target, uid: int, ctx, edit: bool = False):
     """target — Message (при reply) или CallbackQuery (при edit)."""
     u = get_user(uid)
     if u["variant"] == 0:
-        msg = target.message if edit else target
-        await msg.reply_text("Сначала выберите вариант курса через 📚 Уроки")
+        if edit:
+            await target.message.reply_text("Сначала выберите вариант курса через 📚 Уроки")
+        else:
+            await target.reply_text("Сначала выберите вариант курса через 📚 Уроки")
         return
     variant = u["variant"]
     part = u["part"]
@@ -1258,8 +1250,10 @@ async def start_quiz(target, uid: int, ctx, edit: bool = False):
         pool.extend(phrases)
 
     if len(pool) < 4:
-        msg = target.message if edit else target
-        await msg.reply_text("Недостаточно слов для теста.")
+        if edit:
+            await target.message.reply_text("Недостаточно слов для теста.")
+        else:
+            await target.reply_text("Недостаточно слов для теста.")
         return
 
     correct = random.choice(pool)
@@ -1468,21 +1462,19 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         u2 = get_user(uid)
         qs = u2.get("quiz_score", 0)
         qt = u2.get("quiz_total", 0) + 1
+        
         if chosen == correct_idx:
             qs += 1
-            result = "✅ *Правильно!*"
-        else:
-            result = "❌ *Неправильно!*"
-        upd(uid, {"quiz_score": qs, "quiz_total": qt})
-        ctx.user_data.pop("qz_correct", None)
-        ctx.user_data.pop("qz_phrase", None)
-
-        if chosen == correct_idx:
-            # Правильно — сразу следующий вопрос
+            upd(uid, {"quiz_score": qs, "quiz_total": qt})
             await q.answer("✅ Правильно!", show_alert=False)
+            # Очищаем данные теста
+            ctx.user_data.pop("qz_correct", None)
+            ctx.user_data.pop("qz_phrase", None)
+            # Задаём следующий вопрос
             await start_quiz(q, uid, ctx, edit=True)
         else:
             # Неправильно — показываем правильный ответ
+            upd(uid, {"quiz_score": qs, "quiz_total": qt})
             text = (
                 f"❌ *Неправильно!*\n\n"
                 f"🇮🇱 `{correct_phrase.get('he','')}`\n"
@@ -1490,7 +1482,14 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 f"🇷🇺 {correct_phrase.get('ru','')}"
             )
             if u2["variant"] == 2 and "past" in correct_phrase:
-                text += f"\n\n🕰 {correct_phrase['past']}\n🔮 {correct_phrase['future']}"
+                text += f"\n\n🕰 *Прошедшее:* {correct_phrase['past']}\n🔮 *Будущее:* {correct_phrase['future']}"
+            elif "now" in correct_phrase:
+                text += f"\n\n🕐 *Настоящее:* {correct_phrase['now']}"
+            
+            # Очищаем данные теста
+            ctx.user_data.pop("qz_correct", None)
+            ctx.user_data.pop("qz_phrase", None)
+            
             await q.edit_message_text(
                 text,
                 parse_mode="Markdown",
@@ -1511,7 +1510,11 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await q.edit_message_text(
             f"📊 *Ваш счёт*\n\n✅ {qs}/{qt} ({pct}%)\n\n"
             f"{'🏆 Отлично!' if pct >= 80 else '💪 Продолжайте!'}",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔄 Новый вопрос", callback_data="qz_next")],
+                [InlineKeyboardButton("🏠 Меню", callback_data="back_lessons")],
+            ])
         )
 
     # Настройки
