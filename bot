@@ -1243,10 +1243,12 @@ async def show_settings(message, uid: int):
     )
 
 # ── Quiz ─────────────────────────────────────────────────────────────────────
-async def start_quiz(message, uid: int, ctx, edit: bool = False):
+async def start_quiz(target, uid: int, ctx, edit: bool = False):
+    """target — Message (при reply) или CallbackQuery (при edit)."""
     u = get_user(uid)
     if u["variant"] == 0:
-        await message.reply_text("Сначала выберите вариант курса через 📚 Уроки")
+        msg = target.message if edit else target
+        await msg.reply_text("Сначала выберите вариант курса через 📚 Уроки")
         return
     variant = u["variant"]
     part = u["part"]
@@ -1256,7 +1258,8 @@ async def start_quiz(message, uid: int, ctx, edit: bool = False):
         pool.extend(phrases)
 
     if len(pool) < 4:
-        await message.reply_text("Недостаточно слов для теста.")
+        msg = target.message if edit else target
+        await msg.reply_text("Недостаточно слов для теста.")
         return
 
     correct = random.choice(pool)
@@ -1282,16 +1285,12 @@ async def start_quiz(message, uid: int, ctx, edit: bool = False):
         [[InlineKeyboardButton(p["ru"], callback_data=f"qz_{i}")] for i, p in enumerate(options)]
     )
     if edit:
-        await message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+        # target — это CallbackQuery
+        await target.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
         return
 
-    await message.reply_text(
-        text,
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(
-            [[InlineKeyboardButton(p["ru"], callback_data=f"qz_{i}")] for i, p in enumerate(options)]
-        )
-    )
+    # target — это Message
+    await target.reply_text(text, parse_mode="Markdown", reply_markup=kb)
 
 # ── Callback handler ──────────────────────────────────────────────────────────
 async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -1481,7 +1480,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         if chosen == correct_idx:
             # Правильно — сразу следующий вопрос
             await q.answer("✅ Правильно!", show_alert=False)
-            await start_quiz(q.message, uid, ctx, edit=True)
+            await start_quiz(q, uid, ctx, edit=True)
         else:
             # Неправильно — показываем правильный ответ
             text = (
@@ -1502,7 +1501,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             )
 
     elif d == "qz_next":
-        await start_quiz(q.message, uid, ctx, edit=True)
+        await start_quiz(q, uid, ctx, edit=True)
 
     elif d == "qz_score":
         u2 = get_user(uid)
