@@ -970,6 +970,20 @@ COURSE = {
     },
 }
 
+# Короткие коды разделов для callback_data (Telegram лимит 64 байта)
+SEC_CODES = {}
+SEC_BY_CODE = {}
+def _init_sec_codes():
+    idx = 0
+    for v in COURSE.values():
+        for p in v.values():
+            for title in p.keys():
+                if title not in SEC_CODES:
+                    SEC_CODES[title] = str(idx)
+                    SEC_BY_CODE[str(idx)] = title
+                    idx += 1
+_init_sec_codes()
+
 DAILY_TIPS = [
     "💡 Иврит читается справа налево!",
     "💡 В иврите нет заглавных букв.",
@@ -1103,7 +1117,8 @@ def phrase_kb(sec_title: str, pos: int, total_unlearned: int, orig_idx: int):
         InlineKeyboardButton("🔊 Аудио", callback_data=f"au|{sec_title}|{orig_idx}"),
         InlineKeyboardButton("✅ Выучил", callback_data=f"lrn|{sec_title}|{orig_idx}|{pos}"),
     ])
-    rows.append([InlineKeyboardButton("🎯 Тест по этой теме", callback_data="quiz_cur")])
+    code = SEC_CODES.get(sec_title, "0")
+    rows.append([InlineKeyboardButton("🎯 Тест по этой теме", callback_data=f"qs|{code}")])
     rows.append([InlineKeyboardButton("← К урокам", callback_data="back_lessons")])
     return InlineKeyboardMarkup(rows)
 
@@ -1481,6 +1496,13 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             )
 
     # Тест
+    elif d.startswith("qs|"):
+        code = d[3:]
+        sec_title = SEC_BY_CODE.get(code)
+        upd(uid, {"current_sec": sec_title})
+        ctx.user_data["qz_sec"] = sec_title
+        await start_quiz(q.message, uid, ctx, sec_title=sec_title)
+
     elif d == "qz_next":
         await next_quiz(q, uid, ctx)
 
@@ -1536,14 +1558,6 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                     [InlineKeyboardButton("📊 Мой счёт", callback_data="qz_score")],
                 ])
             )
-
-    elif d == "quiz_cur":
-        # Тест по текущему открытому разделу — берём из файла
-        u2 = get_user(uid)
-        sec_title = u2.get("current_sec")
-        if not sec_title:
-            sec_title = ctx.user_data.get("sec")
-        await start_quiz(q.message, uid, ctx, sec_title=sec_title)
 
     # Настройки
     elif d == "toggle_rem":
