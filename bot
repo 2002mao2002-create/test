@@ -67,7 +67,8 @@ TELEGRAM_TOKEN = (
     os.getenv("BOT_API_TOKEN") or ""
 ).strip()
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
-FEEDBACK_USERNAME = "@aaron_ast"   # куда слать пожелания
+FEEDBACK_USERNAME = "@aaron_ast"   # для отображения пользователю
+FEEDBACK_CHAT_ID = 6287004156         # числовой ID для отправки сообщений
 DATA_FILE = Path("user_data.json")
 
 logger.info(f"TELEGRAM_TOKEN: {'OK' if TELEGRAM_TOKEN else 'НЕТ'}")
@@ -1201,25 +1202,23 @@ async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         msg_text = f"📩 Пожелание от {sender} (id: {uid}):\n\n{text}"
         sent = False
         # Пробуем отправить по username (работает если @aaron_ast писал боту хотя бы раз)
-        for chat_id in [FEEDBACK_USERNAME, FEEDBACK_USERNAME.lstrip("@")]:
-            try:
-                payload = json.dumps({
-                    "chat_id": chat_id,
-                    "text": msg_text,
-                }).encode()
-                req = urllib.request.Request(
-                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                    data=payload,
-                    headers={"Content-Type": "application/json"},
-                    method="POST",
-                )
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    result = json.loads(resp.read())
-                    if result.get("ok"):
-                        sent = True
-                        break
-            except Exception as e:
-                logger.warning(f"Feedback attempt failed ({chat_id}): {e}")
+        try:
+            payload = json.dumps({
+                "chat_id": FEEDBACK_CHAT_ID,
+                "text": msg_text,
+            }).encode()
+            req = urllib.request.Request(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                result = json.loads(resp.read())
+                if result.get("ok"):
+                    sent = True
+        except Exception as e:
+            logger.warning(f"Feedback send failed: {e}")
         if sent:
             await update.message.reply_text(
                 f"✅ Спасибо! Сообщение отправлено разработчику.",
