@@ -1304,7 +1304,9 @@ async def next_quiz(q, uid: int, ctx):
     if u["variant"] == 0:
         await q.edit_message_text("Сначала выберите вариант курса через 📚 Уроки")
         return
-    sec_title = ctx.user_data.get("qz_sec")
+    # Берём раздел из файла (надёжнее чем ctx.user_data)
+    u2 = get_user(uid)
+    sec_title = ctx.user_data.get("qz_sec") or u2.get("current_sec")
     text, kb, _, _ = _build_quiz(uid, ctx, sec_title)
     if text is None:
         await q.edit_message_text("Недостаточно слов для теста.")
@@ -1362,6 +1364,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     elif d.startswith("sec|"):
         sec_title = d[4:]
         ctx.user_data["sec"] = sec_title
+        upd(uid, {"current_sec": sec_title})  # сохраняем в файл
         u2 = get_user(uid)
         phrases = COURSE[u2["variant"]][u2["part"]][sec_title]
         unlearned = get_unlearned(uid, sec_title, phrases)
@@ -1393,6 +1396,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     elif d.startswith("ph|"):
         _, sec_title, pos_s = d.split("|", 2)
         pos = int(pos_s)
+        upd(uid, {"current_sec": sec_title})  # актуализируем раздел
         u2 = get_user(uid)
         phrases = COURSE[u2["variant"]][u2["part"]][sec_title]
         unlearned = get_unlearned(uid, sec_title, phrases)
@@ -1534,8 +1538,11 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             )
 
     elif d == "quiz_cur":
-        # Тест по текущему открытому разделу
-        sec_title = ctx.user_data.get("sec")
+        # Тест по текущему открытому разделу — берём из файла
+        u2 = get_user(uid)
+        sec_title = u2.get("current_sec")
+        if not sec_title:
+            sec_title = ctx.user_data.get("sec")
         await start_quiz(q.message, uid, ctx, sec_title=sec_title)
 
     # Настройки
