@@ -930,8 +930,8 @@ async def show_variant_choice(message):
         "• Часть 3: большие числа, остальные глаголы и слова",
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("📘 Вариант 1", callback_data="var_1"),
-             InlineKeyboardButton("📗 Вариант 2", callback_data="var_2")],
+            [InlineKeyboardButton("Вариант 1", callback_data="var_1"),
+             InlineKeyboardButton("Вариант 2", callback_data="var_2")],
         ])
     )
 
@@ -1125,8 +1125,8 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     elif d == "change_variant":
         await q.edit_message_text("Выберите вариант курса:",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("📘 Вариант 1", callback_data="var_1"),
-                 InlineKeyboardButton("📗 Вариант 2", callback_data="var_2")],
+                [InlineKeyboardButton("Вариант 1", callback_data="var_1"),
+                 InlineKeyboardButton("Вариант 2", callback_data="var_2")],
             ])
         )
 
