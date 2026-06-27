@@ -787,7 +787,7 @@ COURSE = {
         2: {
             "Числа 101–10001 🔢":    V1_P2_NUMBERS[10:] + V1_P3_NUMBERS[:4],
             "Глаголы: 3 времени 🔥": V2_P2_VERBS,
-            "Слова (300) 📖":        V1_P1_WORDS + V1_P2_WORDS,
+            "Слова (200) 📖":        V1_P2_WORDS,  # Часть 1 уже изучена
         },
         3: {
             "Большие числа 🔢":      V1_P3_NUMBERS,
@@ -848,6 +848,36 @@ def upd(uid: int, changes: dict):
     data[key].update(changes)
     save_data(data)
 
+def item_word(sec_title: str) -> str:
+    """Возвращает правильное слово для типа контента."""
+    t = sec_title.lower()
+    if "глагол" in t:
+        return "глаголов"
+    elif "числ" in t:
+        return "чисел"
+    else:
+        return "слов"
+
+def item_word_acc(sec_title: str) -> str:
+    """Винительный падеж — 'слово', 'глагол', 'число'."""
+    t = sec_title.lower()
+    if "глагол" in t:
+        return "глагол"
+    elif "числ" in t:
+        return "число"
+    else:
+        return "слово"
+
+def get_unlearned(uid: int, sec_title: str, phrases: list) -> list:
+    """Возвращает только не выученные элементы из списка."""
+    learned = get_user(uid).get("learned", [])
+    result = []
+    for i, p in enumerate(phrases):
+        key = f"{sec_title}|{i}"
+        if key not in learned:
+            result.append((i, p))  # (оригинальный индекс, элемент)
+    return result
+
 def update_streak(uid: int):
     u = get_user(uid)
     today = datetime.now().date().isoformat()
@@ -886,19 +916,20 @@ def lessons_kb(variant: int, part: int):
     rows.append([InlineKeyboardButton("← Назад к частям", callback_data="back_parts")])
     return InlineKeyboardMarkup(rows)
 
-def phrase_kb(sec_title: str, idx: int, total: int):
+def phrase_kb(sec_title: str, pos: int, total_unlearned: int, orig_idx: int):
+    """pos — позиция среди невыученных (0-based), orig_idx — оригинальный индекс в списке."""
     nav = []
-    if idx > 0:
-        nav.append(InlineKeyboardButton("⬅️", callback_data=f"ph|{sec_title}|{idx-1}"))
-    if idx < total - 1:
-        nav.append(InlineKeyboardButton("➡️", callback_data=f"ph|{sec_title}|{idx+1}"))
+    if pos > 0:
+        nav.append(InlineKeyboardButton("⬅️", callback_data=f"ph|{sec_title}|{pos-1}"))
+    if pos < total_unlearned - 1:
+        nav.append(InlineKeyboardButton("➡️", callback_data=f"ph|{sec_title}|{pos+1}"))
 
     rows = []
     if nav:
         rows.append(nav)
     rows.append([
-        InlineKeyboardButton("🔊 Аудио", callback_data=f"au|{sec_title}|{idx}"),
-        InlineKeyboardButton("✅ Выучил", callback_data=f"lrn|{sec_title}|{idx}"),
+        InlineKeyboardButton("🔊 Аудио", callback_data=f"au|{sec_title}|{orig_idx}"),
+        InlineKeyboardButton("✅ Выучил", callback_data=f"lrn|{sec_title}|{orig_idx}|{pos}"),
     ])
     rows.append([InlineKeyboardButton("← К урокам", callback_data="back_lessons")])
     return InlineKeyboardMarkup(rows)
@@ -1098,7 +1129,7 @@ async def start_quiz(message, uid: int, ctx):
         pool.extend(phrases)
 
     if len(pool) < 4:
-        await message.reply_text("Недостаточно фраз для теста.")
+        await message.reply_text("Недостаточно слов для теста.")
         return
 
     correct = random.choice(pool)
@@ -1181,11 +1212,21 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         ctx.user_data["sec"] = sec_title
         u2 = get_user(uid)
         phrases = COURSE[u2["variant"]][u2["part"]][sec_title]
-        phrase = phrases[0]
+        unlearned = get_unlearned(uid, sec_title, phrases)
+        if not unlearned:
+            await q.edit_message_text(
+                f"🎉 *{sec_title}*\n\nВы выучили все {item_word(sec_title)} в этом разделе!\n\nВыберите другой раздел.",
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("← К урокам", callback_data="back_lessons")],
+                ])
+            )
+            return
+        orig_idx, phrase = unlearned[0]
         await q.edit_message_text(
-            phrase_text(phrase, u2["variant"], 0, len(phrases), sec_title),
+            phrase_text(phrase, u2["variant"], orig_idx, len(phrases), sec_title),
             parse_mode="Markdown",
-            reply_markup=phrase_kb(sec_title, 0, len(phrases))
+            reply_markup=phrase_kb(sec_title, 0, len(unlearned), orig_idx)
         )
 
     elif d == "back_lessons":
@@ -1196,16 +1237,26 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             reply_markup=lessons_kb(u2["variant"], u2["part"])
         )
 
-    # Навигация по фразам
+    # Навигация по словам/глаголам (pos — позиция среди невыученных)
     elif d.startswith("ph|"):
-        _, sec_title, idx_s = d.split("|", 2)
-        idx = int(idx_s)
+        _, sec_title, pos_s = d.split("|", 2)
+        pos = int(pos_s)
         u2 = get_user(uid)
         phrases = COURSE[u2["variant"]][u2["part"]][sec_title]
+        unlearned = get_unlearned(uid, sec_title, phrases)
+        if not unlearned or pos >= len(unlearned):
+            await q.edit_message_text(
+                f"🎉 Все {item_word(sec_title)} в этом разделе выучены!",
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("← К урокам", callback_data="back_lessons")
+                ]])
+            )
+            return
+        orig_idx, phrase = unlearned[pos]
         await q.edit_message_text(
-            phrase_text(phrases[idx], u2["variant"], idx, len(phrases), sec_title),
+            phrase_text(phrase, u2["variant"], orig_idx, len(phrases), sec_title),
             parse_mode="Markdown",
-            reply_markup=phrase_kb(sec_title, idx, len(phrases))
+            reply_markup=phrase_kb(sec_title, pos, len(unlearned), orig_idx)
         )
 
     # Аудио
@@ -1236,34 +1287,41 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 parse_mode="Markdown"
             )
 
-    # Выучил
+    # Выучил (callback: lrn|sec_title|orig_idx|pos)
     elif d.startswith("lrn|"):
-        _, sec_title, idx_s = d.split("|", 2)
-        key = f"{sec_title}|{idx_s}"
+        parts = d.split("|")
+        # parts: ['lrn', sec_title, orig_idx, pos]
+        sec_title = parts[1]
+        orig_idx = int(parts[2])
+        pos = int(parts[3]) if len(parts) > 3 else 0
+        key = f"{sec_title}|{orig_idx}"
         u2 = get_user(uid)
         learned = u2.get("learned", [])
         if key not in learned:
             learned.append(key)
             upd(uid, {"learned": learned})
-            await q.answer("✅ Фраза отмечена как выученная!", show_alert=False)
+            await q.answer("✅ Выучено!", show_alert=False)
         else:
-            await q.answer("Вы уже выучили эту фразу 🌟", show_alert=False)
-        # Переходим к следующей
-        idx = int(idx_s)
+            await q.answer("Уже выучено 🌟", show_alert=False)
+        # Переходим к следующей невыученной
         phrases = COURSE[u2["variant"]][u2["part"]][sec_title]
-        if idx + 1 < len(phrases):
+        unlearned = get_unlearned(uid, sec_title, phrases)
+        if not unlearned:
             await q.edit_message_text(
-                phrase_text(phrases[idx+1], u2["variant"], idx+1, len(phrases), sec_title),
-                parse_mode="Markdown",
-                reply_markup=phrase_kb(sec_title, idx+1, len(phrases))
-            )
-        else:
-            await q.edit_message_text(
-                f"🎉 *Урок завершён!*\n\n{sec_title}\n\nВыучено всех фраз в этой теме!",
+                f"🎉 *{sec_title}*\n\nВы выучили все {item_word(sec_title)} в этом разделе!",
                 parse_mode="Markdown",
                 reply_markup=InlineKeyboardMarkup([
                     [InlineKeyboardButton("← К урокам", callback_data="back_lessons")],
                 ])
+            )
+        else:
+            # Показываем ту же позицию (или последнюю если список стал короче)
+            new_pos = min(pos, len(unlearned) - 1)
+            new_orig_idx, phrase = unlearned[new_pos]
+            await q.edit_message_text(
+                phrase_text(phrase, u2["variant"], new_orig_idx, len(phrases), sec_title),
+                parse_mode="Markdown",
+                reply_markup=phrase_kb(sec_title, new_pos, len(unlearned), new_orig_idx)
             )
 
     # Тест
