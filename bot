@@ -1444,23 +1444,34 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         phrase = COURSE[u2["variant"]][u2["part"]][sec_title][idx]
         he = phrase["he"]
         await q.answer("🔊 Генерирую аудио...", show_alert=False)
+        # Удаляем предыдущее аудио если есть
+        prev_audio_id = ctx.user_data.get("last_audio_msg_id")
+        if prev_audio_id:
+            try:
+                await q.message.chat.delete_message(prev_audio_id)
+            except Exception:
+                pass
+            ctx.user_data.pop("last_audio_msg_id", None)
+
         try:
             loop = asyncio.get_event_loop()
             audio = await loop.run_in_executor(None, lambda: get_audio(he))
             if audio:
-                await q.message.reply_voice(
+                sent = await q.message.reply_voice(
                     voice=io.BytesIO(audio),
                     caption=f"🇮🇱 {he}  👄 {phrase['tr']}  🇷🇺 {phrase['ru']}"
                 )
+                ctx.user_data["last_audio_msg_id"] = sent.message_id
             else:
                 raise Exception("no audio")
         except Exception as e:
             logger.warning(f"Audio failed: {e}")
-            await q.message.reply_text(
+            sent = await q.message.reply_text(
                 f"🔊 *{he}*\n👄 _{phrase['tr']}_\n🇷🇺 {phrase['ru']}\n\n"
                 f"_Произнесите вслух!_",
                 parse_mode="Markdown"
             )
+            ctx.user_data["last_audio_msg_id"] = sent.message_id
 
     # Выучил (callback: lrn|sec_title|orig_idx|pos)
     elif d.startswith("lrn|"):
