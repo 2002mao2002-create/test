@@ -1081,8 +1081,8 @@ def update_streak(uid: int):
 # ═══════════════════════════════════════════════════════════════════════════════
 def main_kb():
     return ReplyKeyboardMarkup([
-        ["📚 Уроки", "🎯 Тест"],
-        ["📊 Прогресс", "💡 Совет дня"],
+        ["📚 Уроки", "📊 Прогресс"],
+        ["💡 Совет дня"],
         ["✉️ Пожелания", "⚙️ Настройки"],
     ], resize_keyboard=True)
 
@@ -1195,8 +1195,6 @@ async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 parse_mode="Markdown",
                 reply_markup=parts_kb(u["variant"], u["part"])
             )
-    elif text == "🎯 Тест":
-        await start_quiz(update.message, uid, ctx)  # sec_title=None — весь пул
     elif text == "📊 Прогресс":
         await show_progress(update.message, uid)
     elif text == "💡 Совет дня":
@@ -1286,15 +1284,23 @@ def _build_quiz(uid: int, ctx, sec_title: str = None):
     ctx.user_data["qz_sec"] = sec_title  # запоминаем раздел
 
     label = sec_title if sec_title else f"Вариант {variant}, Часть {part}"
-    text = (
-        f"🎯 *Тест* ({label})\n\n"
-        f"Как переводится?\n\n"
-        f"🇮🇱 `{correct['he']}`\n"
-        f"👄 _{correct['tr']}_\n\n"
-        f"Выберите правильный перевод:"
-    )
-    if variant == 2 and "now" in correct:
-        text += f"\n\n🕐 {correct['now']}"
+    is_verb = "now" in correct  # глагол если есть поле "now"
+    if variant == 2 and is_verb:
+        # Для глаголов варианта 2 — показываем три времени, без подсказки
+        text = (
+            f"🎯 *Тест* ({label})\n\n"
+            f"Как переводится?\n\n"
+            f"🇮🇱 `{correct['he']}`\n"
+            f"👄 _{correct['tr']}_"
+        )
+    else:
+        text = (
+            f"🎯 *Тест* ({label})\n\n"
+            f"Как переводится?\n\n"
+            f"🇮🇱 `{correct['he']}`\n"
+            f"👄 _{correct['tr']}_\n\n"
+            f"Выберите правильный перевод:"
+        )
 
     kb = InlineKeyboardMarkup(
         [[InlineKeyboardButton(p["ru"], callback_data=f"qz_{i}")] for i, p in enumerate(options)]
@@ -1522,7 +1528,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         correct_idx = ctx.user_data.get("qz_correct")
         correct_phrase = ctx.user_data.get("qz_phrase", {})
         if correct_idx is None:
-            await q.edit_message_text("Начните тест заново через 🎯 Тест")
+            await q.edit_message_text("Начните тест заново — откройте урок и нажмите 🎯 Тест по этой теме")
             return
         u2 = get_user(uid)
         qs = u2.get("quiz_score", 0)
