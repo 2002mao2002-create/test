@@ -1444,42 +1444,22 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         phrase = COURSE[u2["variant"]][u2["part"]][sec_title][idx]
         he = phrase["he"]
         await q.answer("🔊 Генерирую аудио...", show_alert=False)
-        # Удаляем карточку — вместо неё будет одно голосовое сообщение
-        try:
-            await q.message.delete()
-        except Exception:
-            pass
         try:
             loop = asyncio.get_event_loop()
             audio = await loop.run_in_executor(None, lambda: get_audio(he))
             if audio:
-                await q.message.chat.send_voice(
+                await q.message.reply_voice(
                     voice=io.BytesIO(audio),
-                    caption=(
-                        f"🇮🇱 {he}\n"
-                        f"👄 {phrase['tr']}\n"
-                        f"🇷🇺 {phrase['ru']}\n\n"
-                        f"_нажмите ▶️ для прослушивания_"
-                    ),
-                    parse_mode="Markdown",
-                    reply_markup=InlineKeyboardMarkup([
-                        [InlineKeyboardButton("← Назад к уроку", callback_data=f"sec|{sec_title}")]
-                    ])
+                    caption=f"🇮🇱 {he}  👄 {phrase['tr']}  🇷🇺 {phrase['ru']}"
                 )
             else:
                 raise Exception("no audio")
         except Exception as e:
             logger.warning(f"Audio failed: {e}")
-            await q.message.chat.send_message(
-                f"🔊 *Произношение:*\n\n"
-                f"🇮🇱 `{he}`\n"
-                f"👄 _{phrase['tr']}_\n"
-                f"🇷🇺 {phrase['ru']}\n\n"
-                f"_Произнесите вслух несколько раз!_",
-                parse_mode="Markdown",
-                reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("← Назад к уроку", callback_data=f"sec|{sec_title}")]
-                ])
+            await q.message.reply_text(
+                f"🔊 *{he}*\n👄 _{phrase['tr']}_\n🇷🇺 {phrase['ru']}\n\n"
+                f"_Произнесите вслух!_",
+                parse_mode="Markdown"
             )
 
     # Выучил (callback: lrn|sec_title|orig_idx|pos)
