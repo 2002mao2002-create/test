@@ -1035,6 +1035,64 @@ def upd(uid: int, changes: dict):
     data[key].update(changes)
     save_data(data)
 
+async def send_phrase_with_audio(query_or_msg, uid, variant, phrase, orig_idx, total, sec_title, pos, unlearned_count, ctx, edit=False):
+    """Удаляет старое сообщение, отправляет голосовое с полным текстом карточки и кнопками."""
+    kb = phrase_kb(sec_title, pos, unlearned_count, orig_idx)
+    he = phrase["he"]
+    tr = phrase["tr"]
+    ru = phrase["ru"]
+
+    # Формируем подпись — весь текст карточки
+    caption_lines = [
+        f"🇮🇱 {he}",
+        f"👄 {tr}",
+        f"🇷🇺 {ru}",
+    ]
+    if "now" in phrase:
+        caption_lines.append(f"\n🕐 {phrase['now']}")
+    if variant == 2:
+        if "past" in phrase:
+            caption_lines.append(f"🕰 {phrase['past']}")
+        if "future" in phrase:
+            caption_lines.append(f"🔮 {phrase['future']}")
+    caption_lines.append(f"\n📌 {sec_title} — {orig_idx+1}/{total}")
+    caption = "\n".join(caption_lines)
+
+    chat = query_or_msg.message.chat if edit else query_or_msg.chat
+
+    # Удаляем предыдущее сообщение (карточку или голосовое)
+    prev_id = ctx.user_data.get("last_card_msg_id")
+    if prev_id:
+        try:
+            await chat.delete_message(prev_id)
+        except Exception:
+            pass
+
+    # Генерируем аудио
+    loop = asyncio.get_event_loop()
+    audio = None
+    try:
+        audio = await loop.run_in_executor(None, lambda: get_audio(he))
+    except Exception as e:
+        logger.warning(f"Audio: {e}")
+
+    if audio:
+        # Голосовое с полным текстом в подписи и кнопками
+        sent = await chat.send_voice(
+            voice=io.BytesIO(audio),
+            caption=caption,
+            reply_markup=kb
+        )
+    else:
+        # Fallback — текстовая карточка если аудио недоступно
+        sent = await chat.send_message(
+            phrase_text(phrase, variant, orig_idx, total, sec_title),
+            parse_mode="Markdown",
+            reply_markup=kb
+        )
+
+    ctx.user_data["last_card_msg_id"] = sent.message_id
+
 def item_word(sec_title: str) -> str:
     """Возвращает правильное слово для типа контента."""
     t = sec_title.lower()
@@ -1114,7 +1172,6 @@ def phrase_kb(sec_title: str, pos: int, total_unlearned: int, orig_idx: int):
     if nav:
         rows.append(nav)
     rows.append([
-        InlineKeyboardButton("🔊 Аудио", callback_data=f"au|{sec_title}|{orig_idx}"),
         InlineKeyboardButton("✅ Выучил", callback_data=f"lrn|{sec_title}|{orig_idx}|{pos}"),
     ])
     code = SEC_CODES.get(sec_title, "0")
@@ -1399,11 +1456,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             )
             return
         orig_idx, phrase = unlearned[0]
-        await q.edit_message_text(
-            phrase_text(phrase, u2["variant"], orig_idx, len(phrases), sec_title),
-            parse_mode="Markdown",
-            reply_markup=phrase_kb(sec_title, 0, len(unlearned), orig_idx)
-        )
+        await send_phrase_with_audio(q, uid, u2["variant"], phrase, orig_idx, len(phrases), sec_title, 0, len(unlearned), ctx, edit=True)
 
     elif d == "back_lessons":
         u2 = get_user(uid)
@@ -1430,48 +1483,11 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             )
             return
         orig_idx, phrase = unlearned[pos]
-        await q.edit_message_text(
-            phrase_text(phrase, u2["variant"], orig_idx, len(phrases), sec_title),
-            parse_mode="Markdown",
-            reply_markup=phrase_kb(sec_title, pos, len(unlearned), orig_idx)
-        )
+        await send_phrase_with_audio(q, uid, u2["variant"], phrase, orig_idx, len(phrases), sec_title, pos, len(unlearned), ctx, edit=True)
 
-    # Аудио
+    # Аудио (кнопка удалена, обработчик оставлен для совместимости)
     elif d.startswith("au|"):
-        _, sec_title, idx_s = d.split("|", 2)
-        idx = int(idx_s)
-        u2 = get_user(uid)
-        phrase = COURSE[u2["variant"]][u2["part"]][sec_title][idx]
-        he = phrase["he"]
-        await q.answer("🔊 Генерирую аудио...", show_alert=False)
-        # Удаляем предыдущее аудио если есть
-        prev_audio_id = ctx.user_data.get("last_audio_msg_id")
-        if prev_audio_id:
-            try:
-                await q.message.chat.delete_message(prev_audio_id)
-            except Exception:
-                pass
-            ctx.user_data.pop("last_audio_msg_id", None)
-
-        try:
-            loop = asyncio.get_event_loop()
-            audio = await loop.run_in_executor(None, lambda: get_audio(he))
-            if audio:
-                sent = await q.message.reply_voice(
-                    voice=io.BytesIO(audio),
-                    caption=f"🇮🇱 {he}  👄 {phrase['tr']}  🇷🇺 {phrase['ru']}"
-                )
-                ctx.user_data["last_audio_msg_id"] = sent.message_id
-            else:
-                raise Exception("no audio")
-        except Exception as e:
-            logger.warning(f"Audio failed: {e}")
-            sent = await q.message.reply_text(
-                f"🔊 *{he}*\n👄 _{phrase['tr']}_\n🇷🇺 {phrase['ru']}\n\n"
-                f"_Произнесите вслух!_",
-                parse_mode="Markdown"
-            )
-            ctx.user_data["last_audio_msg_id"] = sent.message_id
+        pass
 
     # Выучил (callback: lrn|sec_title|orig_idx|pos)
     elif d.startswith("lrn|"):
@@ -1504,11 +1520,7 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             # Показываем ту же позицию (или последнюю если список стал короче)
             new_pos = min(pos, len(unlearned) - 1)
             new_orig_idx, phrase = unlearned[new_pos]
-            await q.edit_message_text(
-                phrase_text(phrase, u2["variant"], new_orig_idx, len(phrases), sec_title),
-                parse_mode="Markdown",
-                reply_markup=phrase_kb(sec_title, new_pos, len(unlearned), new_orig_idx)
-            )
+            await send_phrase_with_audio(q, uid, u2["variant"], phrase, new_orig_idx, len(phrases), sec_title, new_pos, len(unlearned), ctx, edit=True)
 
     # Тест
     elif d.startswith("qs|"):
